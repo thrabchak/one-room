@@ -22,7 +22,11 @@ OneRoom.Game = function( game )
 
   this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
+
   this.santa = null;
+  this.santaGrounded = false;
+  this.santaGroundedType = -1;
+
   this.treeSprite = null;
   this.moonSprite = null;
 
@@ -54,6 +58,8 @@ OneRoom.Game.prototype.create = function()
   this.setupInput();
   this.setupGraphics();
   this.setupSounds();
+
+  this.game.debug.reset();
 };
 
 OneRoom.Game.prototype.setupInput = function()
@@ -180,7 +186,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 OneRoom.Game.prototype.setupSanta = function()
 {
-  this.santa = this.add.sprite(370, 0, 'santa');
+  this.santa = this.add.sprite(375, 410, 'santa');
 
   fps = 40;
   this.santa.animations.add('idle', [0], fps, true);
@@ -261,6 +267,9 @@ OneRoom.Game.prototype.setupSounds = function()
 OneRoom.Game.prototype.update = function()
 {
   this.gamepadUpdate();
+
+  this.physics.arcade.collide( this.santa, this.layer, this.handlePlatformCollision, null, this );
+
   this.santaMovementUpdate();
   this.physics.arcade.collide(this.santa, this.layer);
 };
@@ -313,6 +322,14 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     {
       this.santa.scale.x *= -1;
     }
+};
+
+OneRoom.Game.prototype.handlePlatformCollision = function( santa, platformLayer )
+{
+  if( santa.body.touching.down  )
+  {
+    console.print( "hello" );
+  }
 };
 
 OneRoom.Game.prototype.escapeKeyDown = function( button )
@@ -473,3 +490,10 @@ OneRoom.Game.prototype.toggleMute = function()
   muteButtonText.text = muteText;
   muteButtonText.setStyle( muteButtonStyle );
 };
+/*
+OneRoom.Game.prototype.render = function()
+{
+  this.game.debug.body( this.santa );
+  this.game.debug.body( this.treeSprite );
+};
+*/
