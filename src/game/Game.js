@@ -185,6 +185,8 @@ OneRoom.Game.prototype.setupSanta = function()
   this.santa.animations.add('idle', [0], fps, true);
   this.santa.animations.add('run_right', [1,2,3,4,5,6,7,8,9,10,11], fps, true);
 
+  this.santa.anchor.setTo( .5, .5 );
+
   this.game.physics.arcade.enable(this.santa);
 
   this.santa.body.bounce.y = 0.2;
