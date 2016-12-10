@@ -53,6 +53,14 @@ OneRoom.Game.prototype.create = function()
 
 OneRoom.Game.prototype.setupInput = function()
 {
+  // Game Controls
+  // =========
+  // Key                 Normal Action      Special
+  // Arrow left          Move left          Run left
+  // Arrow right         Move right         Run right
+  // Arrow down          Crouch             Slide
+  // Space bar           Jump               Double bounce off walls?
+
   this.escapeKey = this.input.keyboard.addKey( Phaser.Keyboard.ESC );
   this.escapeKey.onDown.add( this.escapeKeyDown, this );
 
@@ -98,7 +106,10 @@ OneRoom.Game.prototype.setupInput = function()
   // Gamepads.
   this.setupGamepads();
 
+  // Movement controls
   this.cursorKeys = this.input.keyboard.createCursorKeys();
+  this.spaceBar = this.input.keyboard.addKey( Phaser.Keyboard.SPACEBAR );
+  this.spaceBar.onDown.add( this.spacebarKeyDown, this );
 };
 
 OneRoom.Game.prototype.setupGamepads = function()
@@ -273,6 +284,11 @@ OneRoom.Game.prototype.escapeKeyDown = function( button )
   this.toggleModal();
 };
 
+OneRoom.Game.prototype.spacebarKeyDown = function( button )
+{
+  console.log("Spacebar down");
+};
+
 OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
 {
   this.targetPoint.copyFrom( pointer );
@@ -348,9 +364,9 @@ OneRoom.Game.prototype.makeImpact = function( x, y )
     this.bell.onPlay.add( this.adjustBellPitch, this );
   }
 
-  this.bell.play();
+  //this.bell.play();
 
-  this.resetCircleSprite( this.circleSprite, x, y );
+  //this.resetCircleSprite( this.circleSprite, x, y );
 };
 
 OneRoom.Game.prototype.createCircleSprite = function()
