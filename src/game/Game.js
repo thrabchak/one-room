@@ -22,6 +22,7 @@ OneRoom.Game = function( game )
 
   this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
+  this.santaSprite = null;
 
   this.map = null;
   this.layer = null;
@@ -39,6 +40,8 @@ OneRoom.Game.prototype.init = function()
 
 OneRoom.Game.prototype.create = function()
 {
+  this.physics.startSystem(Phaser.Physics.ARCADE);
+
   this.stage.backgroundColor = 0x171642; 
 
   this.setupInput();
@@ -115,6 +118,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.circleSprite = this.createCircleSprite();
 
+
   this.game.world.bringToTop( allTextGroup );
 
   var background = this.game.add.sprite( 0, 0 );
@@ -151,6 +155,19 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.modalGroup.visible = false;
 
   this.buildWorld();
+
+  this.setupSanta();
+
+};
+
+OneRoom.Game.prototype.setupSanta = function()
+{
+  this.santaSprite = this.add.sprite(250, 0, 'santa');
+  this.game.physics.arcade.enable(this.santaSprite);
+
+  this.santaSprite.body.bounce.y = 0.2;
+  this.santaSprite.body.gravity.y = 300;
+  this.santaSprite.body.collideWorldBounds = true;
 };
 
 OneRoom.Game.prototype.buildWorld = function()

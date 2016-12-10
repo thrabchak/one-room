@@ -30,11 +30,18 @@ OneRoom.Preloader.prototype.preload = function()
                                  this.world.height - this.preloader.height * 2 );
   this.load.setPreloadSprite( this.preloader );
 
+  this.preloadSprites();
+
   this.preloadTileGraphics();
 
   this.preloadBackgroundImages();
 
   this.load.audio( "bell2", "assets/sounds/bell2.wav" );
+};
+
+OneRoom.Preloader.prototype.preloadSprites = function()
+{
+  this.load.image( "santa", "assets/santa/png/idle(1)187_128.png" );
 };
 
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
