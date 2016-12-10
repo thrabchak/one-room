@@ -36,8 +36,9 @@ OneRoom.Game = function( game )
   this.targetPoint = new Phaser.Point();
 
   this.santa = null;
-  this.santaGrounded = false;
   this.santaGroundedType = -1;
+  this.santaInChimney = false;
+  this.santaChinmeyDirection = 0;
 
   this.treeSprite = null;
   this.moonSprite = null;
@@ -82,7 +83,7 @@ OneRoom.Game.prototype.setupInput = function()
   // Key                 Normal Action      Special
   // Arrow left          Move left          Run left
   // Arrow right         Move right         Run right
-  // Arrow down          Crouch             Slide
+  // Arrow down          Crouch             Go down chimney, Slide
   // Space bar           Jump               Double bounce off walls?
 
   this.escapeKey = this.input.keyboard.addKey( Phaser.Keyboard.ESC );
@@ -199,7 +200,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 OneRoom.Game.prototype.setupSanta = function()
 {
-  this.santa = this.add.sprite(375, 410, 'santa');
+  this.santa = this.add.sprite(375, 40, 'santa');
 
   fps = 40;
   this.santa.animations.add('idle', [0], fps, true);
@@ -209,9 +210,14 @@ OneRoom.Game.prototype.setupSanta = function()
 
   this.game.physics.arcade.enable(this.santa);
 
-  this.santa.body.bounce.y = 0.2;
-  this.santa.body.gravity.y = 300;
-  this.santa.body.collideWorldBounds = true;
+  // TODO: This needs to be cleaned up with santa sprite.
+  var halfSantaWidth = this.santa.width / 2.0;
+  var fourthSantaWidth = halfSantaWidth / 2.0;
+  this.santa.body.setSize( fourthSantaWidth, this.santa.height, fourthSantaWidth / 2.0, 0 );
+
+  //this.santa.body.bounce.y = 0.2;
+  //this.santa.body.gravity.y = 300;
+  //this.santa.body.collideWorldBounds = true;
 };
 
 OneRoom.Game.prototype.buildWorld = function()
@@ -286,10 +292,21 @@ OneRoom.Game.prototype.update = function()
 {
   this.gamepadUpdate();
 
-  this.physics.arcade.collide( this.santa, this.layer, this.handlePlatformCollision, null, this );
-
   this.santaMovementUpdate();
-  this.physics.arcade.collide(this.santa, this.layer);
+
+  if( !this.santaInChimney )
+  {
+    this.physics.arcade.collide( this.santa, this.layer, this.handlePlatformCollision, null, this );
+  }
+  else
+  {
+    this.updateSantaGroundedType();
+    if( this.santaGroundedType === 0 ) // Standing, but not on chinmey.
+    {
+      this.santaInChimney = false;
+      this.santa.alpha = 1.0;
+    }
+  }
 
   this.objectiveUpdate();
 };
@@ -340,6 +357,22 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
 
     changedFacingDirection = false;
 
+    if( this.santaInChimney )
+    {
+      // Disable santa controls while in chimney.
+      return;
+    }
+    else
+    {
+      if( this.cursorKeys.down.isDown && this.santaGroundedType === 1 )
+      {
+        // Santa is above the chinmey and wishes to go down.
+        var chinmeyDirection = 1; // Down.
+        this.putSantaInChinmey( chinmeyDirection );
+        return;
+      }
+    }
+
     if (this.cursorKeys.left.isDown)
     {
       //  Move to the left
@@ -382,12 +415,73 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     }
 };
 
+OneRoom.Game.prototype.updateSantaGroundedType = function()
+{
+  var isStandingOnChinmey = false;
+
+  //if( santa.body.blocked.down )
+  if( !this.santa.body.onFloor() &&
+      !this.santaInChimney )
+  {
+    this.santaGroundedType = -1;
+    return;
+  }
+  else
+  {
+    var halfSantaBodyWidth = this.santa.body.width / 2.0;
+    var fourthSantaBodyWidth = halfSantaBodyWidth / 2.0;
+
+    var tiles = this.layer.getTiles( this.santa.body.x + fourthSantaBodyWidth,
+                                     this.santa.body.bottom,
+                                     halfSantaBodyWidth, 32 );
+    for( var index = 0; index < tiles.length; ++index )
+    {
+      var tile = tiles[index];
+      if( tile.index > 0 &&
+          tile.properties !== undefined &&
+          tile.properties.type !== "normal" )
+      {
+        if( tile.properties.type === "chimney_top" )
+        {
+          isStandingOnChinmey =  true;
+        }
+      }
+    }
+  }
+
+  if( isStandingOnChinmey )
+  {
+    this.santaGroundedType = 1;
+  }
+  else
+  {
+    this.santaGroundedType = 0;
+  }
+};
+
 OneRoom.Game.prototype.handlePlatformCollision = function( santa, platformLayer )
 {
-  if( santa.body.touching.down  )
+  this.updateSantaGroundedType();
+
+  if( this.santaGroundedType === 1 )
   {
-    console.print( "hello" );
+    //this.santa.tint = 0xff0000;
   }
+  else
+  {
+    //this.santa.tint = 0xffffff;
+  }
+};
+
+OneRoom.Game.prototype.putSantaInChinmey = function( chinmeyDirection )
+{
+  this.santaInChimney = true;
+  this.santa.alpha = 0.5;
+  
+  this.santaChinmeyDirection = chinmeyDirection;
+
+  //var chinmeyMovementVelocity = 150;
+  //this.santa.body.velocity.y = chinmeyMovementVelocity * chinmeyDirection;
 };
 
 OneRoom.Game.prototype.escapeKeyDown = function( button )
