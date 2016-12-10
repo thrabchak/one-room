@@ -28,6 +28,7 @@ OneRoom.Game = function( game )
 
   this.map = null;
   this.layer = null;
+  this.objectLayer = null;
 
   this.bell = null;
   this.soundList = [];
@@ -212,6 +213,10 @@ OneRoom.Game.prototype.loadLevelTilemap = function()
   this.map.createLayer( "Middleground" );
   this.map.createLayer( "Decorations" );
   this.layer = this.map.createLayer( "Platforms" );
+  
+  this.objectLayer = this.map.createLayer( "Decorations" );
+  this.objectLayer.visible = false;
+
   this.layer.resizeWorld();
 
   // Build collision list.
