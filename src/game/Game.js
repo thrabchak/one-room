@@ -134,6 +134,10 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.game.world.sendToBack( background );
 
+  this.buildWorld();
+
+  this.setupSanta();
+
   // Set up modal background.
   var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -157,11 +161,6 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.modalGroup.add( this.modalYesButton );
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
-
-  this.buildWorld();
-
-  this.setupSanta();
-
 };
 
 OneRoom.Game.prototype.setupSanta = function()
