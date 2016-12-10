@@ -307,16 +307,26 @@ OneRoom.Game.prototype.update = function()
 {
   this.gamepadUpdate();
 
-  this.santaMovementUpdate();
-
   if( !this.santaInChimney )
   {
     this.physics.arcade.collide( this.santa, this.layer, this.handlePlatformCollision, null, this );
   }
   else
   {
+    var chinmeyMovementVelocity = 150.0;
+    this.santa.body.velocity.y = chinmeyMovementVelocity * this.santaChinmeyDirection;
+    
     this.updateSantaGroundedType();
-    if( this.santaGroundedType === 0 ) // Standing, but not on chinmey.
+    
+    if( this.santaChinmeyDirection > 0 &&
+        this.santaGroundedType === 0 ) // Standing, but not on chimney.
+    {
+      this.santaInChimney = false;
+      this.santa.alpha = 1.0;
+    }
+    else
+    if( this.santaChinmeyDirection < 0 &&
+        this.santaGroundedType === 1 ) // Standing, but on chimney.
     {
       this.santaInChimney = false;
       this.santa.alpha = 1.0;
@@ -324,6 +334,8 @@ OneRoom.Game.prototype.update = function()
   }
 
   this.objectiveUpdate();
+
+  this.santaMovementUpdate();
 };
 
 OneRoom.Game.prototype.objectiveUpdate = function( button )
@@ -383,7 +395,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
       {
         // Santa is above the chinmey and wishes to go down.
         var chinmeyDirection = 1; // Down.
-        this.putSantaInChinmey( chinmeyDirection );
+        this.putSantaInChimney( chinmeyDirection );
         return;
       }
     }
@@ -419,9 +431,22 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     }
 
     //  Allow the this.santa to jump if they are touching the ground.
-    if (this.cursorKeys.up.isDown && this.santa.body.touching.down)
+    if( this.cursorKeys.up.isDown )
     {
-        this.santa.body.velocity.y = -350;
+      if(this.santa.body.blocked.down)
+      {
+        if( Phaser.Rectangle.intersects( this.santa, this.fireplaceZone ) )
+        {
+          // Send santa up chinmey.
+          var chinmeyDirection = -1;
+          this.putSantaInChimney( chinmeyDirection );
+        }
+        else
+        {
+          // Jump.
+          this.santa.body.velocity.y = -350;
+        }
+      }
     }
 
     if(changedFacingDirection)
@@ -434,8 +459,7 @@ OneRoom.Game.prototype.updateSantaGroundedType = function()
 {
   var isStandingOnChinmey = false;
 
-  //if( santa.body.blocked.down )
-  if( !this.santa.body.onFloor() &&
+  if( !this.santa.body.blocked.down &&
       !this.santaInChimney )
   {
     this.santaGroundedType = -1;
@@ -488,12 +512,16 @@ OneRoom.Game.prototype.handlePlatformCollision = function( santa, platformLayer 
   }
 };
 
-OneRoom.Game.prototype.putSantaInChinmey = function( chinmeyDirection )
+OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
 {
   this.santaInChimney = true;
   this.santa.alpha = 0.5;
+
+  // TODO: Adjust santa's X position to be centered in chinmey.
   
   this.santaChinmeyDirection = chinmeyDirection;
+
+  //this.santa.body.gravity.y = 0.0;
 
   //var chinmeyMovementVelocity = 150;
   //this.santa.body.velocity.y = chinmeyMovementVelocity * chinmeyDirection;
@@ -661,6 +689,7 @@ OneRoom.Game.prototype.toggleMute = function()
 OneRoom.Game.prototype.render = function()
 {
   this.game.debug.body( this.santa );
+  this.game.debug.bodyInfo( this.santa, 32, 32 );
   this.game.debug.body( this.treeSprite );
   this.game.debug.body( this.fireplaceZone );
 };
