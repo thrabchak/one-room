@@ -23,6 +23,9 @@ OneRoom.Game = function( game )
   this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
 
+  this.map = null;
+  this.layer = null;
+
   this.bell = null;
   this.soundList = [];
 };
@@ -146,6 +149,41 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.modalGroup.add( this.modalYesButton );
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
+
+  this.buildWorld();
+};
+
+OneRoom.Game.prototype.buildWorld = function()
+{
+  this.map = this.game.add.tilemap( "map" );
+  this.map.addTilesetImage( "Simple" );
+  this.map.smoothed = false;
+
+  this.map.createLayer( "Background" );
+  this.layer = this.map.createLayer( "Platforms" );
+  this.layer.resizeWorld();
+
+  // Build collision list.
+  // TODO: Pull tileset names from list rather than hardcode.
+  var collisionTileIndexList = [];
+  var n = 0
+  var tilesets = this.map.tilesets;
+  var numberOfTilesets = tilesets.length;
+  var tileIndex = 0;
+
+  for( var i = 0; i < numberOfTilesets; i++ )
+  {
+    var tileset = tilesets[i];
+    if( ( tileset.name === "Simple" ) )
+    {
+      for( var n = 0; n < tileset.total; n++ )
+      {
+        collisionTileIndexList.push( tileIndex++ );
+      }
+    }
+  }
+
+  this.map.setCollision( collisionTileIndexList, true, this.layer );
 };
 
 OneRoom.Game.prototype.setupSounds = function()
