@@ -155,6 +155,13 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 OneRoom.Game.prototype.buildWorld = function()
 {
+  this.loadLevelTilemap();
+
+  this.loadBackgroundImage();
+};
+
+OneRoom.Game.prototype.loadLevelTilemap = function()
+{
   this.map = this.game.add.tilemap( "map" );
   this.map.addTilesetImage( "Simple" );
   this.map.smoothed = false;
@@ -184,6 +191,12 @@ OneRoom.Game.prototype.buildWorld = function()
   }
 
   this.map.setCollision( collisionTileIndexList, true, this.layer );
+};
+
+OneRoom.Game.prototype.loadBackgroundImage = function()
+{
+  var background = this.game.add.sprite( 0, 0, "Night Sky" );
+  this.game.world.sendToBack( background );
 };
 
 OneRoom.Game.prototype.setupSounds = function()

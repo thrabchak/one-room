@@ -32,6 +32,8 @@ OneRoom.Preloader.prototype.preload = function()
 
   this.preloadTileGraphics();
 
+  this.preloadBackgroundImages();
+
   this.load.audio( "bell2", "assets/sounds/bell2.wav" );
 };
 
@@ -39,6 +41,11 @@ OneRoom.Preloader.prototype.preloadTileGraphics = function()
 {
   this.load.tilemap( "map", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
   this.load.image( "Simple", "assets/graphics/tiles/Simple.png" );
+};
+
+OneRoom.Preloader.prototype.preloadBackgroundImages = function()
+{
+  this.load.image( "Night Sky", "assets/graphics/background/bsc/night_sky_960x540.png" );
 };
 
 OneRoom.Preloader.prototype.create = function()
