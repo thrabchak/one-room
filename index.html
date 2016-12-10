@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<title>One Room</title>
+		<meta charset="UTF-8" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<meta name="mobile-web-app-capable" content="yes"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta name="keywords" content=""/>
+		<meta name="description" content=""/>
+
+		<link rel="icon" sizes="196x196" href="assets/graphics/icons/general/icon196x196.png"/>
+		<link href="style.css" rel="stylesheet" type="text/css" media="screen"/>
+		
+		<!--Library-->
+		<!-- build:template:cordova
+		<script type="text/javascript" src="cordova.js"></script>
+		<script type="text/javascript" src="cordova_plugins.js"></script>
+		/build -->
+
+		<!-- build:js:release src/phaser/phaser.min.js -->
+		<script type="text/javascript" src="src/phaser/phaser.js"></script>
+		<!-- /build -->
+		
+		<!--Main-->
+		<!-- build:js:release src/game/game.min.js -->
+		<script type="text/javascript" src="src/game/JsUtils.js"></script>
+		<script type="text/javascript" src="src/game/OneRoom.js"></script>
+		<script type="text/javascript" src="src/game/Boot.js"></script>
+		<script type="text/javascript" src="src/game/Preloader.js"></script>
+		<script type="text/javascript" src="src/game/MainMenu.js"></script>
+		<script type="text/javascript" src="src/game/Game.js"></script>
+		<script type="text/javascript" src="src/game/About.js"></script>
+		<!-- /build -->
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			window.onload = function()
+			{
+			  OneRoom.run();
+			}
+		</script>
+	</body>
+
+</html>
