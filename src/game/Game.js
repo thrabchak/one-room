@@ -47,6 +47,7 @@ OneRoom.Game.prototype.init = function()
 OneRoom.Game.prototype.create = function()
 {
   this.physics.startSystem(Phaser.Physics.ARCADE);
+  this.physics.arcade.gravity.y = 250;
 
   this.stage.backgroundColor = 0x171642; 
 
@@ -179,7 +180,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 OneRoom.Game.prototype.setupSanta = function()
 {
-  this.santa = this.add.sprite(250, 0, 'santa');
+  this.santa = this.add.sprite(370, 0, 'santa');
 
   fps = 40;
   this.santa.animations.add('idle', [0], fps, true);
@@ -261,10 +262,12 @@ OneRoom.Game.prototype.update = function()
 {
   this.gamepadUpdate();
   this.santaMovementUpdate();
+  this.physics.arcade.collide(this.santa, this.layer);
 };
 
 OneRoom.Game.prototype.santaMovementUpdate = function( button )
 {
+
     //  Reset the players velocity (movement)
     this.santa.body.velocity.x = 0;
 
