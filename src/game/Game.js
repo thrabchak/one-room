@@ -213,6 +213,7 @@ OneRoom.Game.prototype.loadLevelTilemap = function()
   this.map.createLayer( "Middleground" );
   this.map.createLayer( "Decorations" );
   this.layer = this.map.createLayer( "Platforms" );
+  this.layer.visible = false;
   
   this.objectLayer = this.map.createLayer( "Decorations" );
   this.objectLayer.visible = false;
