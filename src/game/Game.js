@@ -209,8 +209,9 @@ OneRoom.Game.prototype.loadLevelTilemap = function()
   this.map.smoothed = false;
 
   this.map.createLayer( "Background" );
+  this.map.createLayer( "Middleground" );
+  this.map.createLayer( "Decorations" );
   this.layer = this.map.createLayer( "Platforms" );
-  //this.map.createLayer( "Decorations" );
   this.layer.resizeWorld();
 
   // Build collision list.
