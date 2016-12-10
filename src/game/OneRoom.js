@@ -46,7 +46,7 @@ OneRoom =
 OneRoom.run = function()
 {
   this.game = new Phaser.Game( this.screenWidth, this.screenHeight,
-                               Phaser.AUTO, "", this );
+                               Phaser.CANVAS, "", this );
 
   this.game.state.add( OneRoom.Boot.stateKey, OneRoom.Boot );
   this.game.state.add( OneRoom.Preloader.stateKey, OneRoom.Preloader );

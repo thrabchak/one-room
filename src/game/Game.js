@@ -642,10 +642,9 @@ OneRoom.Game.prototype.toggleMute = function()
   muteButtonText.text = muteText;
   muteButtonText.setStyle( muteButtonStyle );
 };
-/*
+
 OneRoom.Game.prototype.render = function()
 {
   this.game.debug.body( this.santa );
   this.game.debug.body( this.treeSprite );
 };
-*/
