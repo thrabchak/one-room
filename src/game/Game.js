@@ -23,6 +23,7 @@ OneRoom.Game = function( game )
   this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
   this.santaSprite = null;
+  this.treeSprite = null;
 
   this.map = null;
   this.layer = null;
@@ -177,6 +178,8 @@ OneRoom.Game.prototype.buildWorld = function()
   this.loadLevelTilemap();
 
   this.loadBackgroundImage();
+
+  this.treeSprite = this.add.sprite(550, 350, 'tree');
 };
 
 OneRoom.Game.prototype.loadLevelTilemap = function()

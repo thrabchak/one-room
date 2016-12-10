@@ -41,7 +41,8 @@ OneRoom.Preloader.prototype.preload = function()
 
 OneRoom.Preloader.prototype.preloadSprites = function()
 {
-  this.load.image( "santa", "assets/santa/png/idle(1)187_128.png" );
+  this.load.image( "santa", "assets/graphics/sprites/idle(1)187_128.png" );
+  this.load.image( "tree", "assets/graphics/sprites/christmas_tree.png" );
 };
 
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
