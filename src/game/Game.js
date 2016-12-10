@@ -22,7 +22,7 @@ OneRoom.Game = function( game )
 
   this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
-  this.santaSprite = null;
+  this.santa = null;
   this.treeSprite = null;
   this.moonSprite = null;
 
@@ -31,6 +31,8 @@ OneRoom.Game = function( game )
 
   this.bell = null;
   this.soundList = [];
+
+
 };
 
 OneRoom.Game.stateKey = "Game";
@@ -133,7 +135,6 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.circleSprite = this.createCircleSprite();
 
-
   this.game.world.bringToTop( allTextGroup );
 
   var background = this.game.add.sprite( 0, 0 );
@@ -176,12 +177,18 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 OneRoom.Game.prototype.setupSanta = function()
 {
-  this.santaSprite = this.add.sprite(250, 0, 'santa');
-  this.game.physics.arcade.enable(this.santaSprite);
+  this.santa = this.add.sprite(250, 0, 'santa');
 
-  this.santaSprite.body.bounce.y = 0.2;
-  this.santaSprite.body.gravity.y = 300;
-  this.santaSprite.body.collideWorldBounds = true;
+  walkSpeed = 15;
+  this.santa.animations.add('walk', null, 15, true);
+  this.santa.animations.add('run', null, walkSpeed * 2, true);
+  this.santa.animations.add('idle', null, 3);
+
+  this.game.physics.arcade.enable(this.santa);
+
+  this.santa.body.bounce.y = 0.2;
+  this.santa.body.gravity.y = 300;
+  this.santa.body.collideWorldBounds = true;
 };
 
 OneRoom.Game.prototype.buildWorld = function()
@@ -250,30 +257,30 @@ OneRoom.Game.prototype.update = function()
 OneRoom.Game.prototype.santaMovementUpdate = function( button )
 {
     //  Reset the players velocity (movement)
-    this.santaSprite.body.velocity.x = 0;
+    this.santa.body.velocity.x = 0;
 
     if (this.cursorKeys.left.isDown)
     {
         //  Move to the left
-        this.santaSprite.body.velocity.x = -150;
+        this.santa.body.velocity.x = -150;
     }
     else if (this.cursorKeys.right.isDown)
     {
         //  Move to the right
-        this.santaSprite.body.velocity.x = 150;
+        this.santa.body.velocity.x = 150;
     }
     else
     {
         //  Stand still
-        // this.santaSprite.animations.stop();
+        // this.santa.animations.stop();
 
-        // this.santaSprite.frame = 4;
+        // this.santa.frame = 4;
     }
 
-    //  Allow the this.santaSprite to jump if they are touching the ground.
-    if (this.cursorKeys.up.isDown && this.santaSprite.body.touching.down)
+    //  Allow the this.santa to jump if they are touching the ground.
+    if (this.cursorKeys.up.isDown && this.santa.body.touching.down)
     {
-        this.santaSprite.body.velocity.y = -350;
+        this.santa.body.velocity.y = -350;
     }
 };
 
