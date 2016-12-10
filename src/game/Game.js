@@ -183,10 +183,12 @@ OneRoom.Game.prototype.loadLevelTilemap = function()
 {
   this.map = this.game.add.tilemap( "map" );
   this.map.addTilesetImage( "Simple" );
+  this.map.addTilesetImage( "ForegroundHouse" );
   this.map.smoothed = false;
 
   this.map.createLayer( "Background" );
   this.layer = this.map.createLayer( "Platforms" );
+  //this.map.createLayer( "Decorations" );
   this.layer.resizeWorld();
 
   // Build collision list.

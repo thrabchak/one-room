@@ -48,6 +48,7 @@ OneRoom.Preloader.prototype.preloadTileGraphics = function()
 {
   this.load.tilemap( "map", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
   this.load.image( "Simple", "assets/graphics/tiles/Simple.png" );
+  this.load.image( "ForegroundHouse", "assets/graphics/tiles/ForegroundHouse.png" );
 };
 
 OneRoom.Preloader.prototype.preloadBackgroundImages = function()
