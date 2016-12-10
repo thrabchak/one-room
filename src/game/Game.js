@@ -95,6 +95,8 @@ OneRoom.Game.prototype.setupInput = function()
 
   // Gamepads.
   this.setupGamepads();
+
+  this.cursorKeys = this.input.keyboard.createCursorKeys();
 };
 
 OneRoom.Game.prototype.setupGamepads = function()
@@ -225,6 +227,37 @@ OneRoom.Game.prototype.setupSounds = function()
 OneRoom.Game.prototype.update = function()
 {
   this.gamepadUpdate();
+  this.santaMovementUpdate();
+};
+
+OneRoom.Game.prototype.santaMovementUpdate = function( button )
+{
+    //  Reset the players velocity (movement)
+    this.santaSprite.body.velocity.x = 0;
+
+    if (this.cursorKeys.left.isDown)
+    {
+        //  Move to the left
+        this.santaSprite.body.velocity.x = -150;
+    }
+    else if (this.cursorKeys.right.isDown)
+    {
+        //  Move to the right
+        this.santaSprite.body.velocity.x = 150;
+    }
+    else
+    {
+        //  Stand still
+        // this.santaSprite.animations.stop();
+
+        // this.santaSprite.frame = 4;
+    }
+
+    //  Allow the this.santaSprite to jump if they are touching the ground.
+    if (this.cursorKeys.up.isDown && this.santaSprite.body.touching.down)
+    {
+        this.santaSprite.body.velocity.y = -350;
+    }
 };
 
 OneRoom.Game.prototype.escapeKeyDown = function( button )
