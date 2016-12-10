@@ -42,6 +42,7 @@ OneRoom.Game = function( game )
 
   this.treeSprite = null;
   this.moonSprite = null;
+  this.fireplaceZone = null;
 
   this.map = null;
   this.layer = null;
@@ -235,6 +236,18 @@ OneRoom.Game.prototype.buildWorld = function()
   this.treeSprite.body.immovable = true;
 
   this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
+
+  // Fireplace.
+  var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
+  rectangleBitmapData.ctx.fillStyle = "#ffffff";
+  rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
+  this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
+  this.fireplaceZone = this.add.sprite( 9 * 32, 382, rectangleBitmapData );
+  this.game.physics.arcade.enable( this.fireplaceZone );
+  this.fireplaceZone.enableBody = true;
+  this.fireplaceZone.body.allowGravity = false;
+  this.fireplaceZone.body.immovable = true;
+  this.fireplaceZone.visible = false;
 };
 
 OneRoom.Game.prototype.loadLevelTilemap = function()
@@ -649,4 +662,5 @@ OneRoom.Game.prototype.render = function()
 {
   this.game.debug.body( this.santa );
   this.game.debug.body( this.treeSprite );
+  this.game.debug.body( this.fireplaceZone );
 };
