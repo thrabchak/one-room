@@ -213,7 +213,9 @@ OneRoom.Game.prototype.setupSanta = function()
   // TODO: This needs to be cleaned up with santa sprite.
   var halfSantaWidth = this.santa.width / 2.0;
   var fourthSantaWidth = halfSantaWidth / 2.0;
-  this.santa.body.setSize( fourthSantaWidth, this.santa.height, fourthSantaWidth / 2.0, 0 );
+
+  var adjustedSantaHeight = this.santa.height - 16.0;
+  this.santa.body.setSize( fourthSantaWidth + 16.0, adjustedSantaHeight, fourthSantaWidth, 0.0 );
 
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
