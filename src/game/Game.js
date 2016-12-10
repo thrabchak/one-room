@@ -24,6 +24,7 @@ OneRoom.Game = function( game )
   this.targetPoint = new Phaser.Point();
   this.santaSprite = null;
   this.treeSprite = null;
+  this.moonSprite = null;
 
   this.map = null;
   this.layer = null;
@@ -180,6 +181,7 @@ OneRoom.Game.prototype.buildWorld = function()
   this.loadBackgroundImage();
 
   this.treeSprite = this.add.sprite(550, 350, 'tree');
+  this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
 };
 
 OneRoom.Game.prototype.loadLevelTilemap = function()

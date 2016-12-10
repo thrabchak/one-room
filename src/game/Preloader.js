@@ -41,8 +41,12 @@ OneRoom.Preloader.prototype.preload = function()
 
 OneRoom.Preloader.prototype.preloadSprites = function()
 {
+  // Image Sprites
   this.load.image( "santa", "assets/graphics/sprites/idle(1)187_128.png" );
   this.load.image( "tree", "assets/graphics/sprites/christmas_tree.png" );
+
+  // Spritesheets
+  this.load.spritesheet( "moon_sheet", "assets/graphics/spritesheets/moon_sheet.png", 32, 32 );
 };
 
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
