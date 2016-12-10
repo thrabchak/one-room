@@ -1,3 +1,10 @@
+var Objectives = {
+  DESCEND_CHIMNEY: "Go down the chimney.",
+  PLACE_PRESENTS: "Find the Christmas tree and place the presents.",
+  ASCEND_CHIMNEY: "Leave the house"
+};
+
+
 /** @constructor */
 OneRoom.Game = function( game )
 {
@@ -39,6 +46,7 @@ OneRoom.Game = function( game )
 
   this.santaFacingLeft = false;
 
+  this.objective = Objectives.PLACE_PRESENTS;
 };
 
 OneRoom.Game.stateKey = "Game";
@@ -272,7 +280,45 @@ OneRoom.Game.prototype.update = function()
 
   this.santaMovementUpdate();
   this.physics.arcade.collide(this.santa, this.layer);
+
+  this.objectiveUpdate();
 };
+
+OneRoom.Game.prototype.objectiveUpdate = function( button )
+{
+  if(this.objective == Objectives.DESCEND_CHIMNEY)
+  {
+    var isAtChimney = false;// this.physics.arcade.collide(this.santa, this.fireplaceTopEntrance);
+    if(isAtChimney)
+    {
+      console.log("Descended chimney");
+
+      // Go down chimney
+
+      this.objective = Objectives.PLACE_PRESENTS;
+    }
+  } else if(this.objective == Objectives.PLACE_PRESENTS)
+  {
+    var isAtTree = false; // this.physics.arcade.collide(this.santa, this.christmas_tree);
+    if(isAtTree)
+    {
+      console.log("Placed presents");
+
+      // Place presents
+
+      this.objective = Objectives.ASCEND_CHIMNEY;
+    }
+  } else if(this.objective == Objectives.ASCEND_CHIMNEY)
+  {
+    var isAtFireplace = false; //this.physics.arcade.collide(this.santa, this.fireplaceBotEntrance);
+    if(isAtFireplace)
+    {
+      console.log("Ascending chimney");
+
+      // leave house tween -> next level
+    }
+  }
+}
 
 OneRoom.Game.prototype.santaMovementUpdate = function( button )
 {
@@ -284,32 +330,32 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
 
     if (this.cursorKeys.left.isDown)
     {
-        //  Move to the left
-        this.santa.body.velocity.x = -150;
-        this.santa.animations.play('run_right');
+      //  Move to the left
+      this.santa.body.velocity.x = -150;
+      this.santa.animations.play('run_right');
 
-        if(!this.santaFacingLeft){
-          changedFacingDirection = true;
-        }
+      if(!this.santaFacingLeft){
+        changedFacingDirection = true;
+      }
 
-        this.santaFacingLeft = true;
+      this.santaFacingLeft = true;
     }
     else if (this.cursorKeys.right.isDown)
     {
-        //  Move to the right
-        this.santa.body.velocity.x = 150;
+      //  Move to the right
+      this.santa.body.velocity.x = 150;
 
-        this.santa.animations.play('run_right');
+      this.santa.animations.play('run_right');
 
-        if(this.santaFacingLeft){
-          changedFacingDirection = true;
-        }
-        this.santaFacingLeft = false;
+      if(this.santaFacingLeft){
+        changedFacingDirection = true;
+      }
+      this.santaFacingLeft = false;
     }
     else
     {
-        //  Stand still
-        this.santa.animations.play('idle');
+      //  Stand still
+      this.santa.animations.play('idle');
     }
 
     //  Allow the this.santa to jump if they are touching the ground.
