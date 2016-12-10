@@ -1,9 +1,14 @@
 var Objectives = {
-  DESCEND_CHIMNEY: "Go down the chimney.",
-  PLACE_PRESENTS: "Find the Christmas tree and place the presents.",
-  ASCEND_CHIMNEY: "Leave the house"
+  DESCEND_CHIMNEY: 0,
+  PLACE_PRESENTS: 1,
+  ASCEND_CHIMNEY: 2
 };
 
+var ObjectivesDescriptions = {
+  0: "Go down the chimney.",
+  1: "Find the Christmas tree and place the presents.",
+  2: "Leave the house"
+};
 
 /** @constructor */
 OneRoom.Game = function( game )
@@ -216,6 +221,11 @@ OneRoom.Game.prototype.buildWorld = function()
   this.loadBackgroundImage();
 
   this.treeSprite = this.add.sprite(550, 350, 'tree');
+  this.game.physics.arcade.enable(this.treeSprite);
+  this.treeSprite.enableBody = true;
+  this.treeSprite.body.allowGravity = false;
+  this.treeSprite.body.immovable = true;
+
   this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
 };
 
@@ -296,10 +306,11 @@ OneRoom.Game.prototype.objectiveUpdate = function( button )
       // Go down chimney
 
       this.objective = Objectives.PLACE_PRESENTS;
+      console.log("next objective: " + ObjectivesDescriptions[this.objective]);
     }
   } else if(this.objective == Objectives.PLACE_PRESENTS)
   {
-    var isAtTree = false; // this.physics.arcade.collide(this.santa, this.christmas_tree);
+    var isAtTree = this.physics.arcade.collide(this.santa, this.treeSprite);
     if(isAtTree)
     {
       console.log("Placed presents");
@@ -307,6 +318,7 @@ OneRoom.Game.prototype.objectiveUpdate = function( button )
       // Place presents
 
       this.objective = Objectives.ASCEND_CHIMNEY;
+      console.log("next objective: " + ObjectivesDescriptions[this.objective]);
     }
   } else if(this.objective == Objectives.ASCEND_CHIMNEY)
   {
