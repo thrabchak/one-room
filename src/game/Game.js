@@ -33,6 +33,7 @@ OneRoom.Game = function( game )
   this.bell = null;
   this.soundList = [];
 
+  this.santaFacingLeft = false;
 
 };
 
@@ -183,7 +184,6 @@ OneRoom.Game.prototype.setupSanta = function()
   fps = 40;
   this.santa.animations.add('idle', [0], fps, true);
   this.santa.animations.add('run_right', [1,2,3,4,5,6,7,8,9,10,11], fps, true);
-  this.santa.animations.add('run_left', [12,13,14,15,16,17,18,19,20,21,22], fps);
 
   this.game.physics.arcade.enable(this.santa);
 
@@ -265,11 +265,19 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     //  Reset the players velocity (movement)
     this.santa.body.velocity.x = 0;
 
+    changedFacingDirection = false;
+
     if (this.cursorKeys.left.isDown)
     {
         //  Move to the left
         this.santa.body.velocity.x = -150;
-        this.santa.animations.play('run_left');
+        this.santa.animations.play('run_right');
+
+        if(!this.santaFacingLeft){
+          changedFacingDirection = true;
+        }
+
+        this.santaFacingLeft = true;
     }
     else if (this.cursorKeys.right.isDown)
     {
@@ -277,6 +285,11 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
         this.santa.body.velocity.x = 150;
 
         this.santa.animations.play('run_right');
+
+        if(this.santaFacingLeft){
+          changedFacingDirection = true;
+        }
+        this.santaFacingLeft = false;
     }
     else
     {
@@ -288,6 +301,11 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     if (this.cursorKeys.up.isDown && this.santa.body.touching.down)
     {
         this.santa.body.velocity.y = -350;
+    }
+
+    if(changedFacingDirection)
+    {
+      this.santa.scale.x *= -1;
     }
 };
 
