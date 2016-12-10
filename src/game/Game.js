@@ -179,10 +179,10 @@ OneRoom.Game.prototype.setupSanta = function()
 {
   this.santa = this.add.sprite(250, 0, 'santa');
 
-  walkSpeed = 15;
-  this.santa.animations.add('walk', null, 15, true);
-  this.santa.animations.add('run', null, walkSpeed * 2, true);
-  this.santa.animations.add('idle', null, 3);
+  fps = 40;
+  this.santa.animations.add('idle', [0], fps, true);
+  this.santa.animations.add('run_right', [1,2,3,4,5,6,7,8,9,10,11], fps, true);
+  this.santa.animations.add('run_left', [12,13,14,15,16,17,18,19,20,21,22], fps);
 
   this.game.physics.arcade.enable(this.santa);
 
@@ -264,18 +264,19 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     {
         //  Move to the left
         this.santa.body.velocity.x = -150;
+        this.santa.animations.play('run_left');
     }
     else if (this.cursorKeys.right.isDown)
     {
         //  Move to the right
         this.santa.body.velocity.x = 150;
+
+        this.santa.animations.play('run_right');
     }
     else
     {
         //  Stand still
-        // this.santa.animations.stop();
-
-        // this.santa.frame = 4;
+        this.santa.animations.play('idle');
     }
 
     //  Allow the this.santa to jump if they are touching the ground.

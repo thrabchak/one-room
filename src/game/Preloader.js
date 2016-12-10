@@ -47,9 +47,7 @@ OneRoom.Preloader.prototype.preloadSprites = function()
 
   // Spritesheets
   this.load.spritesheet( "moon_sheet", "assets/graphics/spritesheets/moon_sheet.png", 32, 32 );
-  this.load.spritesheet("santa_idle", "assets/graphics/spritesheets/santa_idle_sheet.png", 187, 128);
-  this.load.spritesheet("santa_walk_right", "assets/graphics/spritesheets/santa_run_right_sheet.png", 187, 128);
-  this.load.spritesheet("santa_walk_left", "assets/graphics/spritesheets/santa_run_left_sheet.png", 187, 128);
+  this.load.spritesheet("santa", "assets/graphics/spritesheets/santa_sheet.png", 187, 128);
 };
 
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
