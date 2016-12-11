@@ -13,6 +13,8 @@ var ObjectivesDescriptions = {
 /** @constructor */
 OneRoom.Game = function( game )
 {
+  this.debugModeOn = false;
+
   this.cursorKeys = null;
   this.spaceBar = null;
   this.enterKey = null;
@@ -90,7 +92,11 @@ OneRoom.Game.prototype.setupInput = function()
   this.escapeKey = this.input.keyboard.addKey( Phaser.Keyboard.ESC );
   this.escapeKey.onDown.add( this.escapeKeyDown, this );
 
+  this.debugKey = this.input.keyboard.addKey( Phaser.Keyboard.P );
+  this.debugKey.onDown.add( this.debugButtonDown, this );
+
   OneRoom.backButtonCallback = this.escapeKeyDown;
+
 
   // Buttons.
   OneRoom.activeButton = null;
@@ -534,6 +540,11 @@ OneRoom.Game.prototype.escapeKeyDown = function( button )
   this.toggleModal();
 };
 
+OneRoom.Game.prototype.debugButtonDown = function( button )
+{
+  this.debugModeOn = !this.debugModeOn;
+};
+
 OneRoom.Game.prototype.spacebarKeyDown = function( button )
 {
   console.log("Spacebar down");
@@ -688,6 +699,11 @@ OneRoom.Game.prototype.toggleMute = function()
 
 OneRoom.Game.prototype.render = function()
 {
+  if( !this.debugModeOn )
+  {
+    return;
+  }
+  
   this.game.debug.body( this.santa );
   this.game.debug.bodyInfo( this.santa, 32, 32 );
   this.game.debug.body( this.treeSprite );
