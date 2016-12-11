@@ -67,6 +67,9 @@ OneRoom.Game = function( game )
   this.santaFacingLeft = false;
 
   this.objective = Objectives.ENTER_HOUSE;
+  this.enteredHouse = false;
+  this.deliveredPresents = false;
+  this.leftHouse = false;
 
   this.presentsGroup = null;
 };
@@ -84,6 +87,11 @@ OneRoom.Game.prototype.create = function()
   this.physics.arcade.gravity.y = 850;
 
   this.stage.backgroundColor = 0x171642; 
+
+  this.objective = Objectives.ENTER_HOUSE;
+  this.enteredHouse = false;
+  this.deliveredPresents = false;
+  this.leftHouse = false;
 
   this.setupInput();
   this.setupGraphics();
@@ -252,7 +260,7 @@ OneRoom.Game.prototype.setupLevelEndDialog = function()
   modalBackground.inputEnabled = true;
   modalBackground.input.priorityID = 2;
 
-  var modalPromptText = "You develivered the presents!\n\nGo to next house?";
+  var modalPromptText = "You delivered the presents!\n\nGo to next house?";
   var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
   modalPrompt.position.setTo( this.game.world.centerX, this.game.world.centerY - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
@@ -303,7 +311,7 @@ OneRoom.Game.prototype.setupSanta = function()
   var adjustedSantaHeight = this.santa.height - 14.0;
   this.santa.body.setSize( fourthSantaWidth + 16.0, adjustedSantaHeight, fourthSantaWidth, 0.0 );
 
-  this.game.camera.follow(this.santa);
+  this.game.camera.follow(this.santa, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
@@ -460,11 +468,15 @@ OneRoom.Game.prototype.update = function()
 
 OneRoom.Game.prototype.enterHouse = function()
 {
+  this.enteredHouse = true;
   this.santaInChimney = false;
   this.santa.alpha = 1.0;
 
-  this.objective = Objectives.PLACE_PRESENTS;
-  console.log("next objective: " + ObjectivesDescriptions[this.objective]);
+  if(!this.deliveredPresents)
+  {    
+    this.objective = Objectives.PLACE_PRESENTS;
+    console.log("next objective: " + ObjectivesDescriptions[this.objective]);
+  }
 };
 
 OneRoom.Game.prototype.leaveHouse = function()
@@ -472,11 +484,15 @@ OneRoom.Game.prototype.leaveHouse = function()
   this.santaInChimney = false;
   this.santa.alpha = 1.0;
 
-  this.objective = Objectives.None;
-  console.log("Congrats you finished the level.");
+  if(this.deliveredPresents)
+  {
+    this.leftHouse = true;
+    this.objective = Objectives.None;
+    console.log("Congrats you finished the level.");
 
-  this.nextLevelDialogGroup.visible = true;
-  this.currentLevelNumber++;
+    this.nextLevelDialogGroup.visible = true;
+    //this.currentLevelNumber++;
+  }
 };
 
 OneRoom.Game.prototype.objectiveUpdate = function()
@@ -486,7 +502,7 @@ OneRoom.Game.prototype.objectiveUpdate = function()
     // See OneRoom.Game.prototype.enterHouse
   } else if(this.objective == Objectives.PLACE_PRESENTS)
   {
-    var isAtTree = (this.cursorKeys.up.isDown || this.cursorKeys.down.isDown) && this.physics.arcade.collide(this.santa, this.treeSprite);
+    var isAtTree = (this.cursorKeys.up.isDown || this.cursorKeys.down.isDown) && this.physics.arcade.collide(this.santa, this.treeSprite) && !this.deliveredPresents;
     if(isAtTree)
     {
       var shouldThrowPresents = this.cursorKeys.up.isDown;
@@ -503,6 +519,7 @@ OneRoom.Game.prototype.objectiveUpdate = function()
 
 OneRoom.Game.prototype.placePresents = function( throwPresents)
 {
+  this.deliveredPresents = true;
   this.presentsGroup.visible = true;
 
   this.presentsGroup.forEach(function(present) {
