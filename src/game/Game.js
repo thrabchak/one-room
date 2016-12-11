@@ -435,7 +435,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
     {
       if(this.santa.body.blocked.down)
       {
-        if( Phaser.Rectangle.intersects( this.santa, this.fireplaceZone ) )
+        if( Phaser.Rectangle.intersects( this.santa.body, this.fireplaceZone.body ) )
         {
           // Send santa up chinmey.
           var chinmeyDirection = -1;
@@ -444,7 +444,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
         else
         {
           // Jump.
-          this.santa.body.velocity.y = -350;
+          //this.santa.body.velocity.y = -350;
         }
       }
     }
