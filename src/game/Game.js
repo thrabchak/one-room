@@ -312,38 +312,31 @@ OneRoom.Game.prototype.buildWorld = function()
 
   this.loadBackgroundImage();
 
-  //if( this.treeSprite === null )
-  {
-    this.treeSprite = this.add.sprite(0, 0, 'tree');
-    this.game.physics.arcade.enable(this.treeSprite);
-    this.treeSprite.enableBody = true;
-    this.treeSprite.body.allowGravity = false;
-    this.treeSprite.body.immovable = true;
-  }
+  this.treeSprite = this.add.sprite(0, 0, 'tree');
+  this.game.physics.arcade.enable(this.treeSprite);
+  this.treeSprite.enableBody = true;
+  this.treeSprite.body.allowGravity = false;
+  this.treeSprite.body.immovable = true;
+
   this.treeSprite.position.setTo( 550, 350 ); // TODO: Pull this from the tile map.
 
-  if( this.moonSprite === null )
-  {
-    this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
-  }
+  this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
 
   // Fireplace.
-  if( this.fireplaceZone === null )
-  {
-    var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
-    rectangleBitmapData.ctx.fillStyle = "#ffffff";
-    rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
-    this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
+  var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
+  rectangleBitmapData.ctx.fillStyle = "#ffffff";
+  rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
+  this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
 
-    this.fireplaceZone = this.add.sprite( 0, 0, rectangleBitmapData );
-    this.fireplaceZone.anchor.set( 0.5 );
+  this.fireplaceZone = this.add.sprite( 0, 0, rectangleBitmapData );
+  this.fireplaceZone.anchor.set( 0.5 );
 
-    this.game.physics.arcade.enable( this.fireplaceZone );
-    this.fireplaceZone.enableBody = true;
-    this.fireplaceZone.body.allowGravity = false;
-    this.fireplaceZone.body.immovable = true;
-    this.fireplaceZone.visible = false;
-  }
+  this.game.physics.arcade.enable( this.fireplaceZone );
+  this.fireplaceZone.enableBody = true;
+  this.fireplaceZone.body.allowGravity = false;
+  this.fireplaceZone.body.immovable = true;
+  this.fireplaceZone.visible = false;
+    
   var fireplaceX = ( 9 * 32 ) + ( this.fireplaceZone.width / 2 ) | 0;
   var fireplaceY = 384 + ( this.fireplaceZone.height / 2 ) | 0;
   this.fireplaceZone.position.setTo( fireplaceX, fireplaceY ); // TODO: Pull this from the tile map.
@@ -780,7 +773,7 @@ OneRoom.Game.prototype.goToNextLevel = function()
 {
   this.game.sound.stopAll();
   
-  this.state.start( OneRoom.Game.stateKey );
+  this.state.start( OneRoom.Game.stateKey, true, false );
 };
 
 OneRoom.Game.prototype.makeImpact = function( x, y )
