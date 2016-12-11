@@ -243,7 +243,7 @@ OneRoom.Game.prototype.setupSanta = function()
   var fourthSantaWidth = halfSantaWidth / 2.0;
 
   var adjustedSantaHeight = this.santa.height - 14.0;
-  this.santa.body.setSize( halfSantaWidth, adjustedSantaHeight, fourthSantaWidth - 8.0, 0.0 );
+  this.santa.body.setSize( fourthSantaWidth + 16.0, adjustedSantaHeight, fourthSantaWidth, 0.0 );
 
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
