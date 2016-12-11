@@ -1,13 +1,15 @@
 var Objectives = {
-  DESCEND_CHIMNEY: 0,
+  ENTER_HOUSE: 0,
   PLACE_PRESENTS: 1,
-  ASCEND_CHIMNEY: 2
+  LEAVE_HOUSE: 2,
+  NONE: 3,
 };
 
 var ObjectivesDescriptions = {
   0: "Go down the chimney.",
   1: "Find the Christmas tree and place the presents.",
-  2: "Leave the house"
+  2: "Leave the house",
+  3: "No objectives."
 };
 
 /** @constructor */
@@ -55,7 +57,7 @@ OneRoom.Game = function( game )
 
   this.santaFacingLeft = false;
 
-  this.objective = Objectives.PLACE_PRESENTS;
+  this.objective = Objectives.ENTER_HOUSE;
 
   this.presentsGroup = null;
 };
@@ -221,6 +223,7 @@ OneRoom.Game.prototype.setupPresents = function()
 
     var randPresScale = getRandomFloat(.5, 1);
     present.scale.setTo(randPresScale, randPresScale);
+    present.anchor.setTo(.5, .5);
   }
 
   this.presentsGroup.visible = false;
@@ -356,15 +359,13 @@ OneRoom.Game.prototype.update = function()
     if( this.santaChinmeyDirection > 0 &&
         this.santaGroundedType === 0 ) // Standing, but not on chimney.
     {
-      this.santaInChimney = false;
-      this.santa.alpha = 1.0;
+      this.enterHouse();
     }
     else
     if( this.santaChinmeyDirection < 0 &&
         this.santaGroundedType === 1 ) // Standing, but on chimney.
     {
-      this.santaInChimney = false;
-      this.santa.alpha = 1.0;
+      this.leaveHouse();
     }
   }
 
@@ -373,45 +374,43 @@ OneRoom.Game.prototype.update = function()
   this.santaMovementUpdate();
 };
 
-
 OneRoom.Game.prototype.enterHouse = function()
 {
+  this.santaInChimney = false;
+  this.santa.alpha = 1.0;
+
   this.objective = Objectives.PLACE_PRESENTS;
   console.log("next objective: " + ObjectivesDescriptions[this.objective]);
 };
 
+OneRoom.Game.prototype.leaveHouse = function()
+{
+  this.santaInChimney = false;
+  this.santa.alpha = 1.0;
+
+  this.objective = Objectives.None;
+  console.log("Congrats you finished the level.");
+};
+
 OneRoom.Game.prototype.objectiveUpdate = function()
 {
-  if(this.objective == Objectives.GO_IN_HOUSE)
+  if(this.objective == Objectives.ENTER_HOUSE)
   {
     // See OneRoom.Game.prototype.enterHouse
-
   } else if(this.objective == Objectives.PLACE_PRESENTS)
   {
     var isAtTree = (this.cursorKeys.up.isDown || this.cursorKeys.down.isDown) && this.physics.arcade.collide(this.santa, this.treeSprite);
     if(isAtTree)
     {
-      console.log("Placed presents");
+      var shouldThrowPresents = this.cursorKeys.up.isDown;
+      this.placePresents(shouldThrowPresents);
 
-      if(this.cursorKeys.up.isDown)
-      {
-        this.placePresents(true);
-      } else {
-        this.placePresents(false);
-      }
-
-      this.objective = Objectives.ASCEND_CHIMNEY;
+      this.objective = Objectives.LEAVE_HOUSE;
       console.log("next objective: " + ObjectivesDescriptions[this.objective]);
     }
-  } else if(this.objective == Objectives.ASCEND_CHIMNEY)
+  } else if(this.objective == Objectives.LEAVE_HOUSE)
   {
-    var isAtFireplace = false; //this.physics.arcade.collide(this.santa, this.fireplaceBotEntrance);
-    if(isAtFireplace)
-    {
-      console.log("Ascending chimney");
-
-      // leave house tween -> next level
-    }
+    // See OneRoom.Game.prototype.leaveHouse
   }
 }
 
@@ -422,18 +421,20 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
   this.presentsGroup.forEach(function(present) {
 
     present.x = this.santa.x;
-    present.y = this.santa.y-100;
+    present.y = this.santa.y-125;
 
     if (!throwPresents)
     {
       present.body.velocity.x = getRandomFloat(-100, 100);
       present.body.velocity.y = -50;
+      present.body.bounce.y = getRandomFloat(.2, .45);
     } else {      
-      present.body.velocity.x = getRandomFloat(-1000, 1000);
+      present.body.velocity.x = getRandomFloat(-500, 500);
       present.body.velocity.y = -500;
       present.body.bounce.y = getRandomFloat(.7, 1);
       present.body.rotation = getRandomFloat(-180,180);
     }
+    present.body.velocity.y += this.santa.body.velocity.y;
     present.body.drag.x = 200;
     present.body.bounce.y = getRandomFloat(.5, .7);
 
@@ -581,6 +582,7 @@ OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
 {
   this.santaInChimney = true;
   this.santa.alpha = 0.5;
+  this.santa.animations.play('idle');
 
   // Adjust santa's X position to be centered in chinmey.
   this.santa.position.setTo( this.fireplaceZone.position.x, this.santa.position.y );
