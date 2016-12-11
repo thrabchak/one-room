@@ -773,6 +773,8 @@ OneRoom.Game.prototype.goToNextLevel = function()
 {
   this.game.sound.stopAll();
   
+  ++OneRoom.currentLevelNumber;
+  
   this.state.start( OneRoom.Game.stateKey, true, false );
 };
 
