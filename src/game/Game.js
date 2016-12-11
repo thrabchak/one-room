@@ -383,12 +383,17 @@ OneRoom.Game.prototype.objectiveUpdate = function()
 
   } else if(this.objective == Objectives.PLACE_PRESENTS)
   {
-    var isAtTree = this.cursorKeys.down.isDown && this.physics.arcade.collide(this.santa, this.treeSprite);
+    var isAtTree = (this.cursorKeys.up.isDown || this.cursorKeys.down.isDown) && this.physics.arcade.collide(this.santa, this.treeSprite);
     if(isAtTree)
     {
       console.log("Placed presents");
 
-      this.placePresents();
+      if(this.cursorKeys.up.isDown)
+      {
+        this.placePresents(true);
+      } else {
+        this.placePresents(false);
+      }
 
       this.objective = Objectives.ASCEND_CHIMNEY;
       console.log("next objective: " + ObjectivesDescriptions[this.objective]);
@@ -405,17 +410,28 @@ OneRoom.Game.prototype.objectiveUpdate = function()
   }
 }
 
-OneRoom.Game.prototype.placePresents = function()
+OneRoom.Game.prototype.placePresents = function( throwPresents)
 {
   this.presentsGroup.visible = true;
 
   this.presentsGroup.forEach(function(present) {
+
     present.x = this.santa.x;
     present.y = this.santa.y-100;
-    present.body.velocity.x = getRandomFloat(-100, 100);
-    present.body.velocity.y = -50;
-    present.body.bounce.y = 0.7 + Math.random() * 0.2;
-    present.body.drag.x = 100;
+
+    if (!throwPresents)
+    {
+      present.body.velocity.x = getRandomFloat(-100, 100);
+      present.body.velocity.y = -50;
+    } else {      
+      present.body.velocity.x = getRandomFloat(-1000, 1000);
+      present.body.velocity.y = -500;
+      present.body.bounce.y = getRandomFloat(.7, 1);
+      present.body.rotation = getRandomFloat(-180,180);
+    }
+    present.body.drag.x = 200;
+    present.body.bounce.y = getRandomFloat(.5, .7);
+
   }, this, true);
     
 };
