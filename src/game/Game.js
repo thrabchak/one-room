@@ -388,7 +388,6 @@ OneRoom.Game.prototype.objectiveUpdate = function()
     {
       console.log("Placed presents");
 
-      // Place presents
       this.placePresents();
 
       this.objective = Objectives.ASCEND_CHIMNEY;
@@ -412,10 +411,11 @@ OneRoom.Game.prototype.placePresents = function()
 
   this.presentsGroup.forEach(function(present) {
     present.x = this.santa.x;
-    present.y = this.santa.y-150;
-    present.body.velocity.x = 0;
-    present.body.velocity.y = 0;
+    present.y = this.santa.y-100;
+    present.body.velocity.x = getRandomFloat(-100, 100);
+    present.body.velocity.y = -50;
     present.body.bounce.y = 0.7 + Math.random() * 0.2;
+    present.body.drag.x = 100;
   }, this, true);
     
 };
