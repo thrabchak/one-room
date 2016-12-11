@@ -444,7 +444,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
         else
         {
           // Jump.
-          //this.santa.body.velocity.y = -350;
+          this.santa.body.velocity.y = -350;
         }
       }
     }
