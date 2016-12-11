@@ -303,6 +303,8 @@ OneRoom.Game.prototype.setupSanta = function()
   var adjustedSantaHeight = this.santa.height - 14.0;
   this.santa.body.setSize( fourthSantaWidth + 16.0, adjustedSantaHeight, fourthSantaWidth, 0.0 );
 
+  this.game.camera.follow(this.santa);
+
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
   //this.santa.body.collideWorldBounds = true;
@@ -513,7 +515,7 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
       present.body.velocity.x = getRandomFloat(-100, 100);
       present.body.velocity.y = -50;
       present.body.bounce.y = getRandomFloat(.2, .45);
-      this.ahSound.play();
+      //this.ahSound.play();
     } else {      
       present.body.velocity.x = getRandomFloat(-500, 500);
       present.body.velocity.y = -500;
