@@ -53,7 +53,10 @@ OneRoom.Preloader.prototype.preloadSprites = function()
 
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
 {
-  this.load.tilemap( "map", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
+  this.load.tilemap( "house0", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
+  this.load.tilemap( "house1", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
+  OneRoom.numberOfLevels = 2;
+
   this.load.image( "Simple", "assets/graphics/tiles/Simple.png" );
   this.load.image( "ForegroundHouse", "assets/graphics/tiles/ForegroundHouse.png" );
 };
@@ -95,7 +98,14 @@ OneRoom.Preloader.prototype.allSoundsDecoded = function()
 
 OneRoom.Preloader.prototype.start = function()
 {
-  // First see if the "state" URL parameter was specified.
+  var levelKey = this.game.net.getQueryString( "level" );
+  if( typeof levelKey === "string" && levelKey !== "" )
+  {
+    OneRoom.currentLevelNumber = levelKey | 0;
+  }
+
+  // See if the "state" URL parameter was specified.
+  // Always check this one last.
   var stateKey = this.game.net.getQueryString( "state" );
   if( typeof stateKey === "string" && stateKey !== "" )
   {
@@ -110,7 +120,4 @@ OneRoom.Preloader.prototype.start = function()
       console.warn( stateKey + " is not a valid state key." );
     }
   }
-
-  // Proceed to main menu, as usual.
-  this.state.start( OneRoom.MainMenu.stateKey );
 };

@@ -40,7 +40,11 @@ OneRoom =
   {
     gui: null,
     window: null
-  }
+  },
+
+  //
+  numberOfLevels: 0,
+  currentLevelNumber: 0
 };
 
 OneRoom.run = function()

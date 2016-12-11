@@ -255,39 +255,62 @@ OneRoom.Game.prototype.setupSanta = function()
 
 OneRoom.Game.prototype.buildWorld = function()
 {
-  this.loadLevelTilemap();
+  this.loadLevelTilemap( OneRoom.currentLevelNumber );
 
   this.loadBackgroundImage();
 
-  this.treeSprite = this.add.sprite(550, 350, 'tree');
-  this.game.physics.arcade.enable(this.treeSprite);
-  this.treeSprite.enableBody = true;
-  this.treeSprite.body.allowGravity = false;
-  this.treeSprite.body.immovable = true;
+  if( this.treeSprite === null )
+  {
+    this.treeSprite = this.add.sprite(0, 0, 'tree');
+    this.game.physics.arcade.enable(this.treeSprite);
+    this.treeSprite.enableBody = true;
+    this.treeSprite.body.allowGravity = false;
+    this.treeSprite.body.immovable = true;
+  }
+  this.treeSprite.position.setTo( 550, 350 ); // TODO: Pull this from the tile map.
 
-  this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
+  if( this.moonSprite === null )
+  {
+    this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
+  }
 
   // Fireplace.
-  var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
-  rectangleBitmapData.ctx.fillStyle = "#ffffff";
-  rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
-  this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
-  
-  var fireplaceX = ( 9 * 32 ) + ( rectangleBitmapData.width / 2 ) | 0;
-  var fireplaceY = 384 + ( rectangleBitmapData.height / 2 ) | 0;;
-  this.fireplaceZone = this.add.sprite( fireplaceX, fireplaceY, rectangleBitmapData );
-  this.fireplaceZone.anchor.set( 0.5 );
-  
-  this.game.physics.arcade.enable( this.fireplaceZone );
-  this.fireplaceZone.enableBody = true;
-  this.fireplaceZone.body.allowGravity = false;
-  this.fireplaceZone.body.immovable = true;
-  this.fireplaceZone.visible = false;
+  if( this.fireplaceZone === null )
+  {
+    var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
+    rectangleBitmapData.ctx.fillStyle = "#ffffff";
+    rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
+    this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
+
+    this.fireplaceZone = this.add.sprite( 0, 0, rectangleBitmapData );
+    this.fireplaceZone.anchor.set( 0.5 );
+
+    this.game.physics.arcade.enable( this.fireplaceZone );
+    this.fireplaceZone.enableBody = true;
+    this.fireplaceZone.body.allowGravity = false;
+    this.fireplaceZone.body.immovable = true;
+    this.fireplaceZone.visible = false;
+  }
+  var fireplaceX = ( 9 * 32 ) + ( this.fireplaceZone.width / 2 ) | 0;
+  var fireplaceY = 384 + ( this.fireplaceZone.height / 2 ) | 0;
+  this.fireplaceZone.position.setTo( fireplaceX, fireplaceY ); // TODO: Pull this from the tile map.
 };
 
-OneRoom.Game.prototype.loadLevelTilemap = function()
+OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
 {
-  this.map = this.game.add.tilemap( "map" );
+  if( levelNumber === undefined )
+  {
+    levelNumber = 0;
+  }
+
+  if( levelNumber > OneRoom.numberOfLevels )
+  {
+    levelNumber = OneRoom.numberOfLevels;
+  }
+
+  var houseTilemapName = "house" + levelNumber;
+  this.map = this.game.add.tilemap( houseTilemapName );
+
   this.map.addTilesetImage( "Simple" );
   this.map.addTilesetImage( "ForegroundHouse" );
   this.map.smoothed = false;
@@ -340,7 +363,6 @@ OneRoom.Game.prototype.setupSounds = function()
 
 OneRoom.Game.prototype.update = function()
 {
-
   this.physics.arcade.collide( this.presentsGroup, this.layer);
 
   this.gamepadUpdate();
