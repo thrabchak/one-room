@@ -56,6 +56,8 @@ OneRoom.Game = function( game )
   this.santaFacingLeft = false;
 
   this.objective = Objectives.PLACE_PRESENTS;
+
+  this.presentsGroup = null;
 };
 
 OneRoom.Game.stateKey = "Game";
@@ -180,6 +182,8 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.setupSanta();
 
+  this.setupPresents();
+
   // Set up modal background.
   var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -204,6 +208,23 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
 };
+
+OneRoom.Game.prototype.setupPresents = function()
+{
+  this.presentsGroup = this.game.add.group();
+  this.presentsGroup.enableBody = true;
+
+  for (var i = 0; i < 12; i++)
+  {
+    var randPresFrame = getRandomIntInclusive(0, 8);
+    var present = this.presentsGroup.create(0, 0, 'present_sheet', randPresFrame);
+
+    var randPresScale = getRandomFloat(.5, 1);
+    present.scale.setTo(randPresScale, randPresScale);
+  }
+
+  this.presentsGroup.visible = false;
+}
 
 OneRoom.Game.prototype.setupSanta = function()
 {
@@ -311,6 +332,9 @@ OneRoom.Game.prototype.setupSounds = function()
 
 OneRoom.Game.prototype.update = function()
 {
+
+  this.physics.arcade.collide( this.presentsGroup, this.layer);
+
   this.gamepadUpdate();
 
   if( !this.santaInChimney )
@@ -344,28 +368,28 @@ OneRoom.Game.prototype.update = function()
   this.santaMovementUpdate();
 };
 
-OneRoom.Game.prototype.objectiveUpdate = function( button )
+
+OneRoom.Game.prototype.enterHouse = function()
 {
-  if(this.objective == Objectives.DESCEND_CHIMNEY)
+  this.objective = Objectives.PLACE_PRESENTS;
+  console.log("next objective: " + ObjectivesDescriptions[this.objective]);
+};
+
+OneRoom.Game.prototype.objectiveUpdate = function()
+{
+  if(this.objective == Objectives.GO_IN_HOUSE)
   {
-    var isAtChimney = false;// this.physics.arcade.collide(this.santa, this.fireplaceTopEntrance);
-    if(isAtChimney)
-    {
-      console.log("Descended chimney");
+    // See OneRoom.Game.prototype.enterHouse
 
-      // Go down chimney
-
-      this.objective = Objectives.PLACE_PRESENTS;
-      console.log("next objective: " + ObjectivesDescriptions[this.objective]);
-    }
   } else if(this.objective == Objectives.PLACE_PRESENTS)
   {
-    var isAtTree = this.physics.arcade.collide(this.santa, this.treeSprite);
+    var isAtTree = this.cursorKeys.down.isDown && this.physics.arcade.collide(this.santa, this.treeSprite);
     if(isAtTree)
     {
       console.log("Placed presents");
 
       // Place presents
+      this.placePresents();
 
       this.objective = Objectives.ASCEND_CHIMNEY;
       console.log("next objective: " + ObjectivesDescriptions[this.objective]);
@@ -382,7 +406,21 @@ OneRoom.Game.prototype.objectiveUpdate = function( button )
   }
 }
 
-OneRoom.Game.prototype.santaMovementUpdate = function( button )
+OneRoom.Game.prototype.placePresents = function()
+{
+  this.presentsGroup.visible = true;
+
+  this.presentsGroup.forEach(function(present) {
+    present.x = this.santa.x;
+    present.y = this.santa.y-150;
+    present.body.velocity.x = 0;
+    present.body.velocity.y = 0;
+    present.body.bounce.y = 0.7 + Math.random() * 0.2;
+  }, this, true);
+    
+};
+
+OneRoom.Game.prototype.santaMovementUpdate = function()
 {
 
     //  Reset the players velocity (movement)
@@ -697,6 +735,16 @@ OneRoom.Game.prototype.toggleMute = function()
   muteButtonText.setStyle( muteButtonStyle );
 };
 
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 OneRoom.Game.prototype.render = function()
 {
   if( !this.debugModeOn )
@@ -709,3 +757,5 @@ OneRoom.Game.prototype.render = function()
   this.game.debug.body( this.treeSprite );
   this.game.debug.body( this.fireplaceZone );
 };
+
+
