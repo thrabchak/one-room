@@ -242,8 +242,8 @@ OneRoom.Game.prototype.setupSanta = function()
   var halfSantaWidth = this.santa.width / 2.0;
   var fourthSantaWidth = halfSantaWidth / 2.0;
 
-  var adjustedSantaHeight = this.santa.height - 16.0;
-  this.santa.body.setSize( fourthSantaWidth + 16.0, adjustedSantaHeight, fourthSantaWidth, 0.0 );
+  var adjustedSantaHeight = this.santa.height - 14.0;
+  this.santa.body.setSize( halfSantaWidth, adjustedSantaHeight, fourthSantaWidth - 8.0, 0.0 );
 
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
@@ -269,7 +269,12 @@ OneRoom.Game.prototype.buildWorld = function()
   rectangleBitmapData.ctx.fillStyle = "#ffffff";
   rectangleBitmapData.ctx.fillRect( 0, 0, rectangleBitmapData.width, rectangleBitmapData.height );
   this.game.cache.addBitmapData( "fireplaceZone", rectangleBitmapData );
-  this.fireplaceZone = this.add.sprite( 9 * 32, 382, rectangleBitmapData );
+  
+  var fireplaceX = ( 9 * 32 ) + ( rectangleBitmapData.width / 2 ) | 0;
+  var fireplaceY = 384 + ( rectangleBitmapData.height / 2 ) | 0;;
+  this.fireplaceZone = this.add.sprite( fireplaceX, fireplaceY, rectangleBitmapData );
+  this.fireplaceZone.anchor.set( 0.5 );
+  
   this.game.physics.arcade.enable( this.fireplaceZone );
   this.fireplaceZone.enableBody = true;
   this.fireplaceZone.body.allowGravity = false;
@@ -577,7 +582,8 @@ OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
   this.santaInChimney = true;
   this.santa.alpha = 0.5;
 
-  // TODO: Adjust santa's X position to be centered in chinmey.
+  // Adjust santa's X position to be centered in chinmey.
+  this.santa.position.setTo( this.fireplaceZone.position.x, this.santa.position.y );
   
   this.santaChinmeyDirection = chinmeyDirection;
 
@@ -767,7 +773,7 @@ OneRoom.Game.prototype.render = function()
   {
     return;
   }
-  
+
   this.game.debug.body( this.santa );
   this.game.debug.bodyInfo( this.santa, 32, 32 );
   this.game.debug.body( this.treeSprite );
