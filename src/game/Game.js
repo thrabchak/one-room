@@ -55,7 +55,10 @@ OneRoom.Game = function( game )
   this.map = null;
   this.layer = null;
   this.objectLayer = null;
-
+  
+  this.woohooSound = null;
+  this.hohohoSound = null;
+  this.stepsSound = null;
   this.bell = null;
   this.soundList = [];
 
@@ -409,6 +412,15 @@ OneRoom.Game.prototype.setupSounds = function()
 {
   this.bell = this.game.add.audio( "bell2" );
   this.soundList.push( this.bell );
+
+  this.hohohoSound = this.game.add.audio( "hohoho", 1, true, true );
+  this.soundList.push( this.hohohoSound );
+
+  this.stepsSound = this.game.add.audio( "steps", .5, true, true );
+  this.soundList.push( this.stepsSound );
+
+  this.woohooSound = this.game.add.audio( "woohoo", 1, false, true );
+  this.soundList.push( this.woohooSound );
 };
 
 OneRoom.Game.prototype.update = function()
@@ -508,6 +520,7 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
       present.body.velocity.y = -500;
       present.body.bounce.y = getRandomFloat(.7, 1);
       present.body.rotation = getRandomFloat(-180,180);
+      this.woohooSound.play();
     }
     present.body.velocity.y += this.santa.body.velocity.y;
     present.body.drag.x = 200;
@@ -547,6 +560,12 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
       this.santa.body.velocity.x = -150;
       this.santa.animations.play('run_right');
 
+      // Play steps sound
+      if(!this.stepsSound.isPlaying)
+      {
+        this.stepsSound.play();
+      }
+
       if(!this.santaFacingLeft){
         changedFacingDirection = true;
       }
@@ -557,8 +576,13 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     {
       //  Move to the right
       this.santa.body.velocity.x = 150;
-
       this.santa.animations.play('run_right');
+
+      // Play steps sound
+      if(!this.stepsSound.isPlaying)
+      {
+        this.stepsSound.play();
+      }
 
       if(this.santaFacingLeft){
         changedFacingDirection = true;
@@ -569,6 +593,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     {
       //  Stand still
       this.santa.animations.play('idle');
+      this.stepsSound.pause();
     }
 
     //  Allow the this.santa to jump if they are touching the ground.

@@ -37,6 +37,9 @@ OneRoom.Preloader.prototype.preload = function()
   this.preloadBackgroundImages();
 
   this.load.audio( "bell2", "assets/sounds/bell2.wav" );
+  this.load.audio( "hohoho", "assets/sounds/hohoho.mp3");
+  this.load.audio( "steps", "assets/sounds/steps.mp3");
+  this.load.audio( "woohoo", "assets/sounds/woohoo.mp3");
 };
 
 OneRoom.Preloader.prototype.preloadSprites = function()
