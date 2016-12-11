@@ -38,8 +38,10 @@ OneRoom.Preloader.prototype.preload = function()
 
   this.load.audio( "bell2", "assets/sounds/bell2.wav" );
   this.load.audio( "hohoho", "assets/sounds/hohoho.mp3");
-  this.load.audio( "steps", "assets/sounds/steps.mp3");
+  this.load.audio( "steps", "assets/sounds/reindeer_bells.wav");
   this.load.audio( "woohoo", "assets/sounds/woohoo.mp3");
+  this.load.audio( "ah", "assets/sounds/ah.mp3");
+  this.load.audio( "box_drop", "assets/sounds/box_drop.mp3");
 };
 
 OneRoom.Preloader.prototype.preloadSprites = function()

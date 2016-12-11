@@ -56,6 +56,8 @@ OneRoom.Game = function( game )
   this.layer = null;
   this.objectLayer = null;
   
+  this.boxDropSound = null;
+  this.ahSound = null;
   this.woohooSound = null;
   this.hohohoSound = null;
   this.stepsSound = null;
@@ -406,7 +408,7 @@ OneRoom.Game.prototype.setupSounds = function()
   this.bell = this.game.add.audio( "bell2" );
   this.soundList.push( this.bell );
 
-  this.hohohoSound = this.game.add.audio( "hohoho", 1, true, true );
+  this.hohohoSound = this.game.add.audio( "hohoho", 1, false, true );
   this.soundList.push( this.hohohoSound );
 
   this.stepsSound = this.game.add.audio( "steps", .5, true, true );
@@ -414,6 +416,9 @@ OneRoom.Game.prototype.setupSounds = function()
 
   this.woohooSound = this.game.add.audio( "woohoo", 1, false, true );
   this.soundList.push( this.woohooSound );
+
+  this.ahSound = this.game.add.audio( "ah", 1, false, true );
+  this.soundList.push( this.ahSound );
 };
 
 OneRoom.Game.prototype.update = function()
@@ -508,6 +513,7 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
       present.body.velocity.x = getRandomFloat(-100, 100);
       present.body.velocity.y = -50;
       present.body.bounce.y = getRandomFloat(.2, .45);
+      this.ahSound.play();
     } else {      
       present.body.velocity.x = getRandomFloat(-500, 500);
       present.body.velocity.y = -500;
@@ -676,6 +682,7 @@ OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
   this.santaInChimney = true;
   this.santa.alpha = 0.5;
   this.santa.animations.play('idle');
+  this.stepsSound.stop();
 
   // Adjust santa's X position to be centered in chinmey.
   this.santa.position.setTo( this.fireplaceZone.position.x, this.santa.position.y );
@@ -703,6 +710,7 @@ OneRoom.Game.prototype.debugButtonDown = function( button )
 OneRoom.Game.prototype.spacebarKeyDown = function( button )
 {
   console.log("Spacebar down");
+  this.hohohoSound.play();
 };
 
 OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
