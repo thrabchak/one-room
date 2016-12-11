@@ -66,7 +66,7 @@ OneRoom.Game.prototype.init = function()
 OneRoom.Game.prototype.create = function()
 {
   this.physics.startSystem(Phaser.Physics.ARCADE);
-  this.physics.arcade.gravity.y = 250;
+  this.physics.arcade.gravity.y = 850;
 
   this.stage.backgroundColor = 0x171642; 
 
@@ -313,7 +313,7 @@ OneRoom.Game.prototype.update = function()
   }
   else
   {
-    var chinmeyMovementVelocity = 150.0;
+    var chinmeyMovementVelocity = 275.0;
     this.santa.body.velocity.y = chinmeyMovementVelocity * this.santaChinmeyDirection;
     
     this.updateSantaGroundedType();
@@ -444,7 +444,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function( button )
         else
         {
           // Jump.
-          this.santa.body.velocity.y = -350;
+          this.santa.body.velocity.y = -450;
         }
       }
     }
