@@ -281,6 +281,7 @@ OneRoom.Game.prototype.setupPresents = function()
 OneRoom.Game.prototype.setupSanta = function()
 {
   this.santa = this.add.sprite(375, 40, 'santa');
+  this.santaFacingLeft = false;
 
   fps = 40;
   this.santa.animations.add('idle', [0], fps, true);
@@ -754,7 +755,7 @@ OneRoom.Game.prototype.goToNextLevel = function()
 {
   this.game.sound.stopAll();
   
-  this.state.start( OneRoom.MainMenu.stateKey );
+  this.state.start( OneRoom.Game.stateKey );
 };
 
 OneRoom.Game.prototype.makeImpact = function( x, y )
