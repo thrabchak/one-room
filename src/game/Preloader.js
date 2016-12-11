@@ -59,7 +59,7 @@ OneRoom.Preloader.prototype.preloadSprites = function()
 OneRoom.Preloader.prototype.preloadTileGraphics = function()
 {
   this.load.tilemap( "house0", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
-  this.load.tilemap( "house1", "assets/levels/house0.json", null, Phaser.Tilemap.TILED_JSON );
+  this.load.tilemap( "house1", "assets/levels/house1.json", null, Phaser.Tilemap.TILED_JSON );
   OneRoom.numberOfLevels = 2;
 
   this.load.image( "Simple", "assets/graphics/tiles/Simple.png" );
