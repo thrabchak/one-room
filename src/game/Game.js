@@ -312,7 +312,7 @@ OneRoom.Game.prototype.buildWorld = function()
 
   this.loadBackgroundImage();
 
-  if( this.treeSprite === null )
+  //if( this.treeSprite === null )
   {
     this.treeSprite = this.add.sprite(0, 0, 'tree');
     this.game.physics.arcade.enable(this.treeSprite);
