@@ -143,6 +143,7 @@ OneRoom.Game.prototype.setupInput = function()
   this.buttonGroup = this.game.add.group();
   this.buttonGroup.add( this.exitButton );
   this.buttonGroup.add( this.muteButton );
+  this.buttonGroup.fixedToCamera = true;
 
   // Modal dialog buttons.
   this.modalYesButton = OneRoom.createTextButton( 0, 0,
@@ -229,7 +230,6 @@ OneRoom.Game.prototype.setupExitDialog = function()
   bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
   bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
   var modalBackground = this.game.add.sprite( 0, 0, bmd );
-  modalBackground.fixedToCamera = true;
   modalBackground.inputEnabled = true;
   modalBackground.input.priorityID = 2;
 
@@ -244,6 +244,7 @@ OneRoom.Game.prototype.setupExitDialog = function()
   this.modalGroup.add( this.modalYesButton );
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
+  this.modalGroup.fixedToCamera = true;
 }
 
 OneRoom.Game.prototype.setupLevelEndDialog = function()
@@ -256,7 +257,6 @@ OneRoom.Game.prototype.setupLevelEndDialog = function()
   bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
   bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
   var modalBackground = this.game.add.sprite( 0, 0, bmd );
-  modalBackground.fixedToCamera = true;
   modalBackground.inputEnabled = true;
   modalBackground.input.priorityID = 2;
 
@@ -271,6 +271,7 @@ OneRoom.Game.prototype.setupLevelEndDialog = function()
   this.nextLevelDialogGroup.add( this.nextLevelButton );
   this.nextLevelDialogGroup.add( this.nextLevelNoButton );
   this.nextLevelDialogGroup.visible = false;
+  this.nextLevelDialogGroup.fixedToCamera = true;
 }
 
 OneRoom.Game.prototype.setupPresents = function()
@@ -411,6 +412,7 @@ OneRoom.Game.prototype.loadBackgroundImage = function()
 {
   var background = this.game.add.sprite( 0, 0, "Night Sky" );
   this.game.world.sendToBack( background );
+  background.fixedToCamera = true;
 };
 
 OneRoom.Game.prototype.setupSounds = function()
