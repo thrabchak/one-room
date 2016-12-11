@@ -120,4 +120,7 @@ OneRoom.Preloader.prototype.start = function()
       console.warn( stateKey + " is not a valid state key." );
     }
   }
+
+  // Proceed to main menu, as usual.
+  this.state.start( OneRoom.MainMenu.stateKey );
 };
