@@ -30,6 +30,10 @@ OneRoom.Game = function( game )
   this.modalNoButton = null;
   this.modalGroup = null;
 
+  this.nextLevelButton = null;
+  this.nextLevelNoButton = null;
+  this.nextLevelDialogGroup = null;
+
   this.gamepadList = OneRoom.gamepadList;
   this.gamepadCallbackList =
   {
@@ -101,7 +105,6 @@ OneRoom.Game.prototype.setupInput = function()
 
   OneRoom.backButtonCallback = this.escapeKeyDown;
 
-
   // Buttons.
   OneRoom.activeButton = null;
 
@@ -138,6 +141,17 @@ OneRoom.Game.prototype.setupInput = function()
                                                    "No", this.toggleModal, this );
   this.modalNoButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 2 );
   this.modalNoButton.input.priorityID = 3;
+
+  // Finished Level dialog buttons.
+  this.nextLevelButton = OneRoom.createTextButton( 0, 0,
+                                                    "Yes", this.goToNextLevel, this );
+  this.nextLevelButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 1 );
+  this.nextLevelButton.input.priorityID = 3;
+
+  this.nextLevelNoButton = OneRoom.createTextButton( 0, 0,
+                                                   "No", this.returnToMainMenu, this );
+  this.nextLevelNoButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 2 );
+  this.nextLevelNoButton.input.priorityID = 3;
 
   // Gamepads.
   this.setupGamepads();
@@ -186,6 +200,14 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.setupPresents();
 
+  this.setupExitDialog();
+
+  this.setupLevelEndDialog();
+
+};
+
+OneRoom.Game.prototype.setupExitDialog = function()
+{
   // Set up modal background.
   var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -209,7 +231,34 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.modalGroup.add( this.modalYesButton );
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
-};
+}
+
+OneRoom.Game.prototype.setupLevelEndDialog = function()
+{
+  // Set up modal background.
+  var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
+  bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
+  bmd.ctx.fillRect( 0, 0, this.game.width, 48 * 3 );
+  bmd.ctx.fillRect( 0, 48 * 9, this.game.width, 48 * 3 );
+  bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
+  bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
+  var modalBackground = this.game.add.sprite( 0, 0, bmd );
+  modalBackground.fixedToCamera = true;
+  modalBackground.inputEnabled = true;
+  modalBackground.input.priorityID = 2;
+
+  var modalPromptText = "You develivered the presents!\n\nGo to next house?";
+  var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
+  modalPrompt.position.setTo( this.game.world.centerX, this.game.world.centerY - 48 * 1 );
+  modalPrompt.anchor.setTo( 0.5, 0.5 );
+
+  this.nextLevelDialogGroup = this.game.add.group();
+  this.nextLevelDialogGroup.add( modalBackground );
+  this.nextLevelDialogGroup.add( modalPrompt );
+  this.nextLevelDialogGroup.add( this.nextLevelButton );
+  this.nextLevelDialogGroup.add( this.nextLevelNoButton );
+  this.nextLevelDialogGroup.visible = false;
+}
 
 OneRoom.Game.prototype.setupPresents = function()
 {
@@ -412,6 +461,9 @@ OneRoom.Game.prototype.leaveHouse = function()
 
   this.objective = Objectives.None;
   console.log("Congrats you finished the level.");
+
+  this.nextLevelDialogGroup.visible = true;
+  this.currentLevelNumber++;
 };
 
 OneRoom.Game.prototype.objectiveUpdate = function()
@@ -692,6 +744,13 @@ OneRoom.Game.prototype.toggleModal = function()
 };
 
 OneRoom.Game.prototype.returnToMainMenu = function()
+{
+  this.game.sound.stopAll();
+  
+  this.state.start( OneRoom.MainMenu.stateKey );
+};
+
+OneRoom.Game.prototype.goToNextLevel = function()
 {
   this.game.sound.stopAll();
   
