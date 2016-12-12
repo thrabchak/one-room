@@ -73,8 +73,10 @@ OneRoom.Game = function( game )
 
   this.presentsGroup = null;
 
-  this.jollyometerValue = 0;
-
+  this.jollyometerValue = 85;
+  this.jollyometer = null;
+  this.jollyIterator = 0;
+  this.jollyDepletionFrames = 18;
 };
 
 OneRoom.Game.stateKey = "Game";
@@ -95,6 +97,7 @@ OneRoom.Game.prototype.create = function()
   this.enteredHouse = false;
   this.deliveredPresents = false;
   this.leftHouse = false;
+  this.jollyometerValue = 85
 
   this.setupInput();
   this.setupGraphics();
@@ -213,6 +216,8 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.buildWorld();
 
+  this.setupJollyometer();
+
   this.setupSanta();
 
   this.setupPresents();
@@ -221,22 +226,35 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.setupLevelEndDialog();
 
-  this.setupJollyometer();
-
 };
 
 OneRoom.Game.prototype.setupJollyometer = function()
 {
-  // Set up modal background.
-  // var bmd = this.game.add.bitmapData( this.camera.width, this.camera.height );
-  // bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
-  // bmd.ctx.fillRect( 0, 0, this.game.width, 48 * 3 );
-  // bmd.ctx.fillRect( 0, 48 * 9, this.game.width, 48 * 3 );
-  // bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
-  // bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
-  // var modalBackground = this.game.add.sprite( 0, 0, bmd );
-  // modalBackground.inputEnabled = true;
-  // modalBackground.input.priorityID = 2;
+  var rectWidth = this.camera.width / 2;
+  var rectHeight = 35;
+
+  var xpos = this.camera.width / 2;
+  var ypos = 30;
+
+  // Setup background
+  var jollyBackgroundBmd = this.game.add.bitmapData( rectWidth, rectHeight );
+  jollyBackgroundBmd.rect(0, 0, rectWidth, rectHeight, "rgba(100,0,0,1)");
+  var jollyometerBackground = this.game.add.sprite( xpos, ypos, jollyBackgroundBmd );
+  jollyometerBackground.anchor.setTo(.5);
+  jollyometerBackground.fixedToCamera = true;
+
+  // Setup foreground
+  var jollyForegroundBmd = this.game.add.bitmapData( rectWidth, rectHeight );
+  jollyForegroundBmd.rect(0, 0, rectWidth, rectHeight, "rgba(0,100,0,1)");
+  this.jollyometer = this.game.add.sprite( xpos, ypos, jollyForegroundBmd );
+  this.jollyometer.anchor.setTo(.5);
+  this.jollyometer.fixedToCamera = true;
+
+  // Setup text
+  var jollyTextValue = "Jolly-ometer";
+  var jollyText = this.game.add.text( 0, 0, jollyTextValue, OneRoom.buttonStyle );
+  jollyText.position.setTo( xpos, ypos );
+  jollyText.anchor.setTo( 0.5 );
 };
 
 OneRoom.Game.prototype.setupExitDialog = function()
@@ -484,7 +502,20 @@ OneRoom.Game.prototype.update = function()
 
   this.objectiveUpdate();
 
+  this.jollyometer.scale.x = this.jollyometerValue / 100;
+  this.jollyIterator += 1;
+  if( this.jollyIterator == this.jollyDepletionFrames )
+  {
+    this.jollyometerValue -= 1;
+    this.jollyIterator = 0;
+  }
+
   this.santaMovementUpdate();
+};
+
+OneRoom.Game.prototype.addJollyness = function(x)
+{
+  this.jollyometerValue = Math.min(100, this.jollyometerValue + x);
 };
 
 OneRoom.Game.prototype.enterHouse = function()
@@ -560,6 +591,7 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
       present.body.bounce.y = getRandomFloat(.7, 1);
       present.body.rotation = getRandomFloat(-180,180);
       this.woohooSound.play();
+      this.addJollyness(100);
     }
     present.body.velocity.y += this.santa.body.velocity.y;
     present.body.drag.x = 200;
@@ -751,6 +783,7 @@ OneRoom.Game.prototype.spacebarKeyDown = function( button )
 {
   console.log("Spacebar down");
   this.hohohoSound.play();
+  this.addJollyness(10);
 };
 
 OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
