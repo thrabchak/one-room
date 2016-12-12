@@ -363,8 +363,8 @@ OneRoom.gamepadOnAxis = function( gamepad, axisIndex, axisValue )
 OneRoom.setupTitleAndText = function( state )
 {
   // Title.
-  var titleTextX = state.world.centerX;
-  var titleTextY = ( state.world.height * ( 1 - 0.67 ) ) | 0;
+  var titleTextX = this.game.camera.width / 2;
+  var titleTextY = ( (this.game.camera.height / 2) * ( 1 - 0.67 ) ) | 0;
   
   var titleText = state.add.text( titleTextX, titleTextY,
                                   OneRoom.projectInfo.window.title, OneRoom.titleStyle );

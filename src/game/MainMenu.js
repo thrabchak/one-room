@@ -49,13 +49,13 @@ OneRoom.MainMenu.prototype.setupInput = function()
   OneRoom.backButtonCallback = this.escapeKeyDown;
 
   // Buttons.
-  this.startButton = OneRoom.createTextButton( this.game.world.centerX, this.game.world.centerY + 48 * 0,
+  this.startButton = OneRoom.createTextButton( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 0,
                                                  "Play", this.startGame, this );
 
-  this.aboutButton = OneRoom.createTextButton( this.game.world.centerX, this.game.world.centerY + 48 * 1,
+  this.aboutButton = OneRoom.createTextButton( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1,
                                                  "About", this.goToAboutScreen, this );
 
-  this.exitButton  = OneRoom.createTextButton( this.game.world.centerX, this.game.world.centerY + 48 * 2,
+  this.exitButton  = OneRoom.createTextButton( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2,
                                                  "Quit", this.escapeKeyDown, this );
 
   this.buttonList.length = 0;
@@ -74,12 +74,12 @@ OneRoom.MainMenu.prototype.setupInput = function()
   // Modal dialog buttons.
   this.modalYesButton = OneRoom.createTextButton( 0, 0,
                                                     "Yes", this.exitGame, this );
-  this.modalYesButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 1 );
+  this.modalYesButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.modalYesButton.input.priorityID = 3;
 
   this.modalNoButton = OneRoom.createTextButton( 0, 0,
                                                    "No", this.toggleModal, this );
-  this.modalNoButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 2 );
+  this.modalNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.modalNoButton.input.priorityID = 3;
 
   OneRoom.setupGamepadsForMenu();
@@ -103,7 +103,7 @@ OneRoom.MainMenu.prototype.setupGraphics = function()
 
   var modalPromptText = "Are you sure you want to quit?";
   var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
-  modalPrompt.position.setTo( this.game.world.centerX, this.game.world.centerY - 48 * 1 );
+  modalPrompt.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
 
   this.modalGroup = this.game.add.group();
