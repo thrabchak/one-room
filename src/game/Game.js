@@ -72,6 +72,11 @@ OneRoom.Game = function( game )
   this.leftHouse = false;
 
   this.presentsGroup = null;
+
+  this.jollyometerValue = 85;
+  this.jollyometer = null;
+  this.jollyIterator = 0;
+  this.jollyDepletionFrames = 18;
 };
 
 OneRoom.Game.stateKey = "Game";
@@ -92,6 +97,7 @@ OneRoom.Game.prototype.create = function()
   this.enteredHouse = false;
   this.deliveredPresents = false;
   this.leftHouse = false;
+  this.jollyometerValue = 85
 
   this.setupInput();
   this.setupGraphics();
@@ -133,9 +139,9 @@ OneRoom.Game.prototype.setupInput = function()
 
   var mute = OneRoom.getMute();
   var muteText = mute ? "Unmute" : "  Mute";
-  var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
+  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
   this.muteButton = OneRoom.createTextButton( 0, 32,
-                                                muteText, this.toggleMute, this, muteButtonStyle );
+                                                muteText, this.toggleMute, null );
 
   this.muteButton.position.x = this.exitButton.position.x - this.muteButton.children[0].width;
   this.muteButton.input.priorityID = 1;
@@ -148,23 +154,23 @@ OneRoom.Game.prototype.setupInput = function()
   // Modal dialog buttons.
   this.modalYesButton = OneRoom.createTextButton( 0, 0,
                                                     "Yes", this.returnToMainMenu, this );
-  this.modalYesButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 1 );
+  this.modalYesButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.modalYesButton.input.priorityID = 3;
 
   this.modalNoButton = OneRoom.createTextButton( 0, 0,
                                                    "No", this.toggleModal, this );
-  this.modalNoButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 2 );
+  this.modalNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.modalNoButton.input.priorityID = 3;
 
   // Finished Level dialog buttons.
   this.nextLevelButton = OneRoom.createTextButton( 0, 0,
                                                     "Yes", this.goToNextLevel, this );
-  this.nextLevelButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 1 );
+  this.nextLevelButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.nextLevelButton.input.priorityID = 3;
 
   this.nextLevelNoButton = OneRoom.createTextButton( 0, 0,
                                                    "No", this.returnToMainMenu, this );
-  this.nextLevelNoButton.position.setTo( this.game.world.centerX, this.game.world.centerY + 48 * 2 );
+  this.nextLevelNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.nextLevelNoButton.input.priorityID = 3;
 
   // Gamepads.
@@ -210,6 +216,8 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.buildWorld();
 
+  this.setupJollyometer();
+
   this.setupSanta();
 
   this.setupPresents();
@@ -220,22 +228,51 @@ OneRoom.Game.prototype.setupGraphics = function()
 
 };
 
+OneRoom.Game.prototype.setupJollyometer = function()
+{
+  var rectWidth = this.camera.width / 2;
+  var rectHeight = 35;
+
+  var xpos = this.camera.width / 2;
+  var ypos = 30;
+
+  // Setup background
+  var jollyBackgroundBmd = this.game.add.bitmapData( rectWidth, rectHeight );
+  jollyBackgroundBmd.rect(0, 0, rectWidth, rectHeight, "rgba(100,0,0,1)");
+  var jollyometerBackground = this.game.add.sprite( xpos, ypos, jollyBackgroundBmd );
+  jollyometerBackground.anchor.setTo(.5);
+  jollyometerBackground.fixedToCamera = true;
+
+  // Setup foreground
+  var jollyForegroundBmd = this.game.add.bitmapData( rectWidth, rectHeight );
+  jollyForegroundBmd.rect(0, 0, rectWidth, rectHeight, "rgba(0,100,0,1)");
+  this.jollyometer = this.game.add.sprite( xpos, ypos, jollyForegroundBmd );
+  this.jollyometer.anchor.setTo(.5);
+  this.jollyometer.fixedToCamera = true;
+
+  // Setup text
+  var jollyTextValue = "Jolly-ometer";
+  var jollyText = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", jollyTextValue, 32 );
+  jollyText.position.setTo( xpos, ypos );
+  jollyText.anchor.setTo( 0.5 );
+};
+
 OneRoom.Game.prototype.setupExitDialog = function()
 {
   // Set up modal background.
-  var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
+  var bmd = this.game.add.bitmapData( this.camera.width, this.camera.height );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
-  bmd.ctx.fillRect( 0, 0, this.game.width, 48 * 3 );
-  bmd.ctx.fillRect( 0, 48 * 9, this.game.width, 48 * 3 );
+  bmd.ctx.fillRect( 0, 0, this.camera.width, 48 * 3 );
+  bmd.ctx.fillRect( 0, 48 * 9, this.camera.width, 48 * 3 );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
-  bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
+  bmd.ctx.fillRect( 0, 48 * 3, this.camera.width, 48 * 6 );
   var modalBackground = this.game.add.sprite( 0, 0, bmd );
   modalBackground.inputEnabled = true;
   modalBackground.input.priorityID = 2;
 
   var modalPromptText = "Are you sure you want to exit?";
-  var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
-  modalPrompt.position.setTo( this.game.world.centerX, this.game.world.centerY - 48 * 1 );
+   var modalPrompt = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", modalPromptText, 32 );
+  modalPrompt.position.setTo( this.camera.width /2 , this.camera.height / 2 - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
 
   this.modalGroup = this.game.add.group();
@@ -245,24 +282,24 @@ OneRoom.Game.prototype.setupExitDialog = function()
   this.modalGroup.add( this.modalNoButton );
   this.modalGroup.visible = false;
   this.modalGroup.fixedToCamera = true;
-}
+};
 
 OneRoom.Game.prototype.setupLevelEndDialog = function()
 {
   // Set up modal background.
-  var bmd = this.game.add.bitmapData( this.game.width, this.game.height );
+  var bmd = this.game.add.bitmapData( this.camera.width, this.camera.height );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.5)";
-  bmd.ctx.fillRect( 0, 0, this.game.width, 48 * 3 );
-  bmd.ctx.fillRect( 0, 48 * 9, this.game.width, 48 * 3 );
+  bmd.ctx.fillRect( 0, 0, this.camera.width, 48 * 3 );
+  bmd.ctx.fillRect( 0, 48 * 9, this.camera.width, 48 * 3 );
   bmd.ctx.fillStyle = "rgba(0,0,0,0.95)";
-  bmd.ctx.fillRect( 0, 48 * 3, this.game.width, 48 * 6 );
+  bmd.ctx.fillRect( 0, 48 * 3, this.camera.width, 48 * 6 );
   var modalBackground = this.game.add.sprite( 0, 0, bmd );
   modalBackground.inputEnabled = true;
   modalBackground.input.priorityID = 2;
 
   var modalPromptText = "You delivered the presents!\n\nGo to next house?";
-  var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
-  modalPrompt.position.setTo( this.game.world.centerX, this.game.world.centerY - 48 * 1 );
+  var modalPrompt = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", modalPromptText, 32 );
+  modalPrompt.position.setTo( this.game.camera.width /2 , this.game.camera.height / 2 - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
 
   this.nextLevelDialogGroup = this.game.add.group();
@@ -272,7 +309,7 @@ OneRoom.Game.prototype.setupLevelEndDialog = function()
   this.nextLevelDialogGroup.add( this.nextLevelNoButton );
   this.nextLevelDialogGroup.visible = false;
   this.nextLevelDialogGroup.fixedToCamera = true;
-}
+};
 
 OneRoom.Game.prototype.setupPresents = function()
 {
@@ -290,7 +327,7 @@ OneRoom.Game.prototype.setupPresents = function()
   }
 
   this.presentsGroup.visible = false;
-}
+};
 
 OneRoom.Game.prototype.setupSanta = function()
 {
@@ -465,7 +502,20 @@ OneRoom.Game.prototype.update = function()
 
   this.objectiveUpdate();
 
+  this.jollyometer.scale.x = this.jollyometerValue / 100;
+  this.jollyIterator += 1;
+  if( this.jollyIterator == this.jollyDepletionFrames )
+  {
+    this.jollyometerValue -= 1;
+    this.jollyIterator = 0;
+  }
+
   this.santaMovementUpdate();
+};
+
+OneRoom.Game.prototype.addJollyness = function(x)
+{
+  this.jollyometerValue = Math.min(100, this.jollyometerValue + x);
 };
 
 OneRoom.Game.prototype.enterHouse = function()
@@ -541,6 +591,7 @@ OneRoom.Game.prototype.placePresents = function( throwPresents)
       present.body.bounce.y = getRandomFloat(.7, 1);
       present.body.rotation = getRandomFloat(-180,180);
       this.woohooSound.play();
+      this.addJollyness(100);
     }
     present.body.velocity.y += this.santa.body.velocity.y;
     present.body.drag.x = 200;
@@ -732,6 +783,7 @@ OneRoom.Game.prototype.spacebarKeyDown = function( button )
 {
   console.log("Spacebar down");
   this.hohohoSound.play();
+  this.addJollyness(10);
 };
 
 OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
@@ -795,7 +847,7 @@ OneRoom.Game.prototype.returnToMainMenu = function()
 {
   this.game.sound.stopAll();
   
-  this.state.start( OneRoom.MainMenu.stateKey );
+  this.state.start( OneRoom.MainMenu.stateKey, true );
 };
 
 OneRoom.Game.prototype.goToNextLevel = function()
@@ -883,11 +935,11 @@ OneRoom.Game.prototype.toggleMute = function()
   OneRoom.setMute( mute );
 
   var muteText = mute ? "Unmute" : "  Mute";
-  var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
+  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
 
   var muteButtonText = this.muteButton.children[0];
   muteButtonText.text = muteText;
-  muteButtonText.setStyle( muteButtonStyle );
+  //muteButtonText.setStyle( muteButtonStyle );
 };
 
 function getRandomIntInclusive(min, max) {
@@ -911,6 +963,7 @@ OneRoom.Game.prototype.render = function()
   this.game.debug.bodyInfo( this.santa, 32, 32 );
   this.game.debug.body( this.treeSprite );
   this.game.debug.body( this.fireplaceZone );
+  this.game.debug.cameraInfo(this.game.camera, 32, 400);
 };
 
 

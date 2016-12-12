@@ -30,6 +30,8 @@ OneRoom.Preloader.prototype.preload = function()
                                  this.world.height - this.preloader.height * 2 );
   this.load.setPreloadSprite( this.preloader );
 
+  this.preloadFonts();
+
   this.preloadSprites();
 
   this.preloadTileGraphics();
@@ -42,6 +44,12 @@ OneRoom.Preloader.prototype.preload = function()
   this.load.audio( "woohoo", "assets/sounds/woohoo.mp3");
   this.load.audio( "ah", "assets/sounds/ah.mp3");
   this.load.audio( "box_drop", "assets/sounds/box_drop.mp3");
+};
+
+OneRoom.Preloader.prototype.preloadFonts = function()
+{
+  this.load.bitmapFont( "MountainsOfChristmas", "assets/graphics/fonts/mountains_of_christmas/MountainsOfChristmas.png",
+                        "assets/graphics/fonts/mountains_of_christmas/MountainsOfChristmas.fnt" );
 };
 
 OneRoom.Preloader.prototype.preloadSprites = function()

@@ -20,6 +20,8 @@
 *.png binary
 *.ico binary
 
+*.ttf binary
+
 *.dbproj binary
 
 *.wav binary
