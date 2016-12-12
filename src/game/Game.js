@@ -399,7 +399,7 @@ OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
     levelNumber = 0;
   }
 
-  if( levelNumber > OneRoom.numberOfLevels )
+  if( levelNumber >= OneRoom.numberOfLevels )
   {
     levelNumber = OneRoom.numberOfLevels;
   }
