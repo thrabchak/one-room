@@ -139,9 +139,9 @@ OneRoom.Game.prototype.setupInput = function()
 
   var mute = OneRoom.getMute();
   var muteText = mute ? "Unmute" : "  Mute";
-  var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
+  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
   this.muteButton = OneRoom.createTextButton( 0, 32,
-                                                muteText, this.toggleMute, this, muteButtonStyle );
+                                                muteText, this.toggleMute, null );
 
   this.muteButton.position.x = this.exitButton.position.x - this.muteButton.children[0].width;
   this.muteButton.input.priorityID = 1;
@@ -252,7 +252,7 @@ OneRoom.Game.prototype.setupJollyometer = function()
 
   // Setup text
   var jollyTextValue = "Jolly-ometer";
-  var jollyText = this.game.add.text( 0, 0, jollyTextValue, OneRoom.buttonStyle );
+  var jollyText = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", jollyTextValue, 32 );
   jollyText.position.setTo( xpos, ypos );
   jollyText.anchor.setTo( 0.5 );
 };
@@ -271,7 +271,7 @@ OneRoom.Game.prototype.setupExitDialog = function()
   modalBackground.input.priorityID = 2;
 
   var modalPromptText = "Are you sure you want to exit?";
-  var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
+   var modalPrompt = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", modalPromptText, 32 );
   modalPrompt.position.setTo( this.camera.width /2 , this.camera.height / 2 - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
 
@@ -298,7 +298,7 @@ OneRoom.Game.prototype.setupLevelEndDialog = function()
   modalBackground.input.priorityID = 2;
 
   var modalPromptText = "You delivered the presents!\n\nGo to next house?";
-  var modalPrompt = this.game.add.text( 0, 0, modalPromptText, OneRoom.buttonStyle );
+  var modalPrompt = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", modalPromptText, 32 );
   modalPrompt.position.setTo( this.game.camera.width /2 , this.game.camera.height / 2 - 48 * 1 );
   modalPrompt.anchor.setTo( 0.5, 0.5 );
 
@@ -935,11 +935,11 @@ OneRoom.Game.prototype.toggleMute = function()
   OneRoom.setMute( mute );
 
   var muteText = mute ? "Unmute" : "  Mute";
-  var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
+  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
 
   var muteButtonText = this.muteButton.children[0];
   muteButtonText.text = muteText;
-  muteButtonText.setStyle( muteButtonStyle );
+  //muteButtonText.setStyle( muteButtonStyle );
 };
 
 function getRandomIntInclusive(min, max) {

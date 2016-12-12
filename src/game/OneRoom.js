@@ -20,12 +20,8 @@ OneRoom =
   screenWidth: 960,
   screenHeight: 540,
 
-  titleStyle: { font: "72px Arial", fill: "#ffffff" },
-
   buttonTextColor: 0xffffff,
   buttonTextOverColor: 0xffff00,
-  buttonStyle: { font: "32px Arial", fill: "#ffffff" },
-  buttonActiveStyle: { font: "32px Arial", fill: "#ffffff", fontStyle: "italic" },
 
   activeButton: null,
 
@@ -237,17 +233,12 @@ OneRoom.activateButtonDown = function( button )
   activeButton.activate.call( this.game.state.getCurrentState(), activeButton, null );
 };
 
-OneRoom.createTextButton = function( x, y, text, callback, callbackContext, style )
+OneRoom.createTextButton = function( x, y, text, callback, callbackContext )
 {
   var button = this.game.add.button( x, y, null, callback, callbackContext );
   button.anchor.setTo( 0.5, 0.5 );
-
-  if( style === undefined )
-  {
-    style = this.buttonStyle;
-  }
   
-  var label = new Phaser.Text( this.game, 0, 0, text, style );
+  var label = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", text, 32 );
   label.anchor.setTo( 0.5, 0.5 );
 
   label.tint = this.buttonTextColor;
@@ -365,9 +356,10 @@ OneRoom.setupTitleAndText = function( state )
   // Title.
   var titleTextX = this.game.camera.width / 2;
   var titleTextY = ( (this.game.camera.height / 2) * ( 1 - 0.67 ) ) | 0;
+  titleTextY += 60;
   
-  var titleText = state.add.text( titleTextX, titleTextY,
-                                  OneRoom.projectInfo.window.title, OneRoom.titleStyle );
+  var titleText = state.game.add.bitmapText( titleTextX, titleTextY, "MountainsOfChristmas",
+                                             OneRoom.projectInfo.window.title, 128 );
 
   titleText.anchor.setTo( 0.5 );
 
