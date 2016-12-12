@@ -401,7 +401,7 @@ OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
 
   if( levelNumber >= OneRoom.numberOfLevels )
   {
-    levelNumber = OneRoom.numberOfLevels;
+    levelNumber = OneRoom.numberOfLevels - 1;
   }
 
   var houseTilemapName = "house" + levelNumber;
