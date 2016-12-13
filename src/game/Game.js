@@ -77,7 +77,7 @@ OneRoom.Game = function( game )
 
   this.presentsGroup = null;
 
-  this.jollyometerValue = 85;
+  this.jollyometerValue = 0;
   this.jollyometer = null;
   this.jollyIterator = 0;
   this.jollyDepletionFrames = 18;
@@ -101,7 +101,8 @@ OneRoom.Game.prototype.create = function()
   this.enteredHouse = false;
   this.deliveredPresents = false;
   this.leftHouse = false;
-  this.jollyometerValue = 85
+
+  this.setJollyometerValue( 85 );
 
   this.setupInput();
   this.setupGraphics();
@@ -552,6 +553,8 @@ OneRoom.Game.prototype.loadBackgroundImage = function()
 
 OneRoom.Game.prototype.setupSounds = function()
 {
+  this.game.sound.stopAll();
+  
   this.bell = this.game.add.audio( "bell2" );
   this.soundList.push( this.bell );
 
@@ -609,7 +612,7 @@ OneRoom.Game.prototype.update = function()
   this.jollyIterator += 1;
   if( this.jollyIterator == this.jollyDepletionFrames )
   {
-    this.jollyometerValue -= 1;
+    this.setJollyometerValue( this.jollyometerValue - 1 );
     this.jollyIterator = 0;
   }
 
@@ -618,8 +621,24 @@ OneRoom.Game.prototype.update = function()
 
 OneRoom.Game.prototype.addJollyness = function(x)
 {
-  this.jollyometerValue = Math.min(100, this.jollyometerValue + x);
+  this.setJollyometerValue( Math.min(100, this.jollyometerValue + x) );
 };
+
+OneRoom.Game.prototype.setJollyometerValue = function( value )
+{
+  this.jollyometerValue = value;
+  if( value <= 0 )
+  {
+    this.killSanta();
+  }
+};
+
+OneRoom.Game.prototype.killSanta = function()
+{
+  // TODO: Give a delay and a message, sound effects?
+
+  this.restartLevel();
+}
 
 OneRoom.Game.prototype.enterHouse = function()
 {
@@ -647,7 +666,7 @@ OneRoom.Game.prototype.leaveHouse = function()
 
     this.nextLevelDialogGroup.visible = true;
     this.setPaused( true );
-    
+
     //this.currentLevelNumber++;
   }
 };
@@ -840,17 +859,17 @@ OneRoom.Game.prototype.updateSantaGroundedType = function()
   }
 };
 
-OneRoom.Game.prototype.handlePlatformCollision = function( santa, platformLayer )
+OneRoom.Game.prototype.handlePlatformCollision = function( santa, tile )
 {
   this.updateSantaGroundedType();
 
-  if( this.santaGroundedType === 1 )
+  var tileType = tile.properties.type;
+  if( tileType !== undefined )
   {
-    //this.santa.tint = 0xff0000;
-  }
-  else
-  {
-    //this.santa.tint = 0xffffff;
+    if( tileType === "death" )
+    {
+      this.setJollyometerValue( 0.0 );
+    }
   }
 };
 
@@ -960,6 +979,13 @@ OneRoom.Game.prototype.returnToMainMenu = function()
   this.game.sound.stopAll();
   
   this.state.start( OneRoom.MainMenu.stateKey, true );
+};
+
+OneRoom.Game.prototype.restartLevel = function()
+{
+  this.game.sound.stopAll(); // TODO: Figure out why this line isn't really stopping sounds.
+
+  this.state.start( OneRoom.Game.stateKey, true, false );
 };
 
 OneRoom.Game.prototype.goToNextLevel = function()
