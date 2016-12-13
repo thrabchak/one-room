@@ -215,7 +215,7 @@ OneRoom.Game.prototype.setupGraphics = function()
   this.game.world.sendToBack( background );
 
   this.buildWorld();
-
+  
   this.setupJollyometer();
 
   this.setupSanta();
@@ -331,7 +331,7 @@ OneRoom.Game.prototype.setupPresents = function()
 
 OneRoom.Game.prototype.setupSanta = function()
 {
-  this.santa = this.add.sprite(375, 40, 'santa');
+  this.santa = this.add.sprite(0, 0, 'santa');
   this.santaFacingLeft = false;
 
   fps = 40;
@@ -354,6 +354,8 @@ OneRoom.Game.prototype.setupSanta = function()
   //this.santa.body.bounce.y = 0.2;
   //this.santa.body.gravity.y = 300;
   //this.santa.body.collideWorldBounds = true;
+
+  this.setSpritePositionFromMap( this.objectLayer, "santa", this.santa );
 };
 
 OneRoom.Game.prototype.buildWorld = function()
@@ -368,9 +370,11 @@ OneRoom.Game.prototype.buildWorld = function()
   this.treeSprite.body.allowGravity = false;
   this.treeSprite.body.immovable = true;
 
-  this.treeSprite.position.setTo( 550, 350 ); // TODO: Pull this from the tile map.
+  this.setSpritePositionFromMap( this.objectLayer, "tree", this.treeSprite );
 
   this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
+
+  this.setupSanta();
 
   // Fireplace.
   var rectangleBitmapData = this.game.add.bitmapData( 32 * 4, 32 * 3 );
@@ -386,10 +390,8 @@ OneRoom.Game.prototype.buildWorld = function()
   this.fireplaceZone.body.allowGravity = false;
   this.fireplaceZone.body.immovable = true;
   this.fireplaceZone.visible = false;
-    
-  var fireplaceX = ( 9 * 32 ) + ( this.fireplaceZone.width / 2 ) | 0;
-  var fireplaceY = 384 + ( this.fireplaceZone.height / 2 ) | 0;
-  this.fireplaceZone.position.setTo( fireplaceX, fireplaceY ); // TODO: Pull this from the tile map.
+  
+  this.setSpritePositionFromMap( this.objectLayer, "fireplace", this.fireplaceZone );
 };
 
 OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
@@ -417,7 +419,7 @@ OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
   this.layer = this.map.createLayer( "Platforms" );
   this.layer.visible = false;
   
-  this.objectLayer = this.map.createLayer( "Decorations" );
+  this.objectLayer = this.map.createLayer( "Objects" );
   this.objectLayer.visible = false;
 
   this.layer.resizeWorld();
@@ -443,6 +445,64 @@ OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
   }
 
   this.map.setCollision( collisionTileIndexList, true, this.layer );
+};
+
+OneRoom.Game.prototype.setSpritePositionFromMap = function( objectLayer, type, sprite )
+{
+  // Scan this object layer for this type of tile.
+  var foundTile = null;
+
+  var layerData = objectLayer.layer.data;
+  var tiles = null;
+  var x = 0;
+  var tile = null;
+  for( var y = 0; y < layerData.length; ++y )
+  {
+    if( foundTile !== null )
+    {
+      break;
+    }
+
+    tiles = layerData[y];
+
+    for( var x = 0; x < tiles.length; ++x )
+    {
+      tile = tiles[x];
+
+      if( tile.index > -1 )
+      {
+        if( tile.properties.type !== undefined )
+        {
+          if( tile.properties.type === type )
+          {
+            foundTile = tile;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // Return non zero and set 0, 0, if this tile type was not found.
+  if( foundTile === null )
+  {
+    sprite.position.set( 0.0 );
+
+    return 1;
+  }
+
+  // Get upper left position of tile.
+  var tileX = ( foundTile.x * foundTile.width );
+  var tileY = ( foundTile.y * foundTile.height );
+
+  // Translate to bottom left.
+  tileY += foundTile.height;
+
+  // Translate to anchor point distance of sprite.
+  tileX += ( ( sprite.anchor.x ) * sprite.width );
+  tileY -= ( ( 1.0 - sprite.anchor.y ) * sprite.height );
+
+  sprite.position.setTo( tileX, tileY );
 };
 
 OneRoom.Game.prototype.loadBackgroundImage = function()
@@ -855,7 +915,7 @@ OneRoom.Game.prototype.goToNextLevel = function()
   this.game.sound.stopAll();
   
   ++OneRoom.currentLevelNumber;
-  
+
   this.state.start( OneRoom.Game.stateKey, true, false );
 };
 

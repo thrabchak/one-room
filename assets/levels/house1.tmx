@@ -24,7 +24,7 @@
   </tile>
   <tile id="6">
    <properties>
-    <property name="type" value="chimney"/>
+    <property name="type" value="fireplace"/>
    </properties>
   </tile>
  </tileset>
@@ -2923,7 +2923,7 @@
    <tile gid="106"/>
   </data>
  </layer>
- <layer name="Platforms" width="60" height="16">
+ <layer name="Platforms" width="60" height="16" visible="0">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -3887,7 +3887,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Objects" width="60" height="16" visible="0">
+ <layer name="Objects" width="60" height="16">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -4018,8 +4018,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
    <tile gid="5"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>

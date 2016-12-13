@@ -24,7 +24,7 @@
   </tile>
   <tile id="6">
    <properties>
-    <property name="type" value="chimney"/>
+    <property name="type" value="fireplace"/>
    </properties>
   </tile>
  </tileset>
@@ -2038,8 +2038,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
    <tile gid="5"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
