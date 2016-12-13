@@ -44,7 +44,6 @@ OneRoom.Game = function( game )
     onDown: this.gamepadOnDown
   };
 
-  this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
 
   this.santa = null;
@@ -65,7 +64,6 @@ OneRoom.Game = function( game )
   this.woohooSound = null;
   this.hohohoSound = null;
   this.stepsSound = null;
-  this.bell = null;
   this.soundList = [];
 
   this.santaFacingLeft = false;
@@ -237,8 +235,6 @@ OneRoom.Game.prototype.setupGraphics = function()
   allTextGroup.alpha = 0.0;
 
   this.game.add.tween( allTextGroup ).to( { alpha: 1 }, 500, Phaser.Easing.Linear.None, true );
-
-  this.circleSprite = this.createCircleSprite();
 
   this.game.world.bringToTop( allTextGroup );
 
@@ -545,9 +541,6 @@ OneRoom.Game.prototype.loadBackgroundImage = function()
 OneRoom.Game.prototype.setupSounds = function()
 {
   this.game.sound.stopAll();
-  
-  this.bell = this.game.add.audio( "bell2" );
-  this.soundList.push( this.bell );
 
   this.hohohoSound = this.game.add.audio( "hohoho", 1, false, true );
   this.soundList.push( this.hohohoSound );
@@ -987,71 +980,7 @@ OneRoom.Game.prototype.goToNextLevel = function()
 
 OneRoom.Game.prototype.makeImpact = function( x, y )
 {
-  if( !!this.bell._sound )
-  {
-    this.adjustBellPitch();
-  }
-  else
-  {
-    this.bell.onPlay.add( this.adjustBellPitch, this );
-  }
-
-  //this.bell.play();
-
-  //this.resetCircleSprite( this.circleSprite, x, y );
-};
-
-OneRoom.Game.prototype.createCircleSprite = function()
-{
-  var bmd = this.game.add.bitmapData( 128, 128 );
-
-  bmd.ctx.fillStyle = "#999999";
-  bmd.ctx.beginPath();
-  bmd.ctx.arc( 64, 64, 64, 0, Math.PI * 2, true ); 
-  bmd.ctx.closePath();
-  bmd.ctx.fill();
-
-  var sprite = this.game.add.sprite( 0, 0, bmd );
-  sprite.anchor.set( 0.5 );
-
-  sprite.alpha = 0.0;
-
-  return sprite;
-};
-
-OneRoom.Game.prototype.adjustBellPitch = function()
-{
-  var verticalScale = 4.0 * ( 1.0 - ( this.targetPoint.y / this.game.world.height ) );
-  this.bell._sound.playbackRate.value = verticalScale;
-};
-
-OneRoom.Game.prototype.resetCircleSprite = function( circleSprite, x, y )
-{
-  circleSprite.position.set( x, y );
-
-  circleSprite.scale.set( 0.5 );
-  circleSprite.alpha = 1.0;
-
-  var verticalScale = ( 1.0 - ( y / this.game.world.height ) );
-  var colorAdjustment = ( verticalScale * 255 ) | 0;
   
-  var r = 255 - colorAdjustment;
-  var g = 63;
-  var b = 0 + colorAdjustment;
-
-  if( colorAdjustment < 128 )
-  {
-    g += b;
-  }
-  else
-  {
-    g += r;
-  }
-
-  circleSprite.tint = ( r << 16 ) + ( g << 8 ) + b;
-
-  this.game.add.tween( circleSprite.scale ).to( { x: 4.0, y: 4.0 }, 500, Phaser.Easing.Sinusoidal.InOut, true );
-  this.game.add.tween( circleSprite ).to( { alpha: 0.0 }, 500, Phaser.Easing.Sinusoidal.InOut, true );
 };
 
 OneRoom.Game.prototype.toggleMute = function()
