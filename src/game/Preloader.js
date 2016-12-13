@@ -38,12 +38,7 @@ OneRoom.Preloader.prototype.preload = function()
 
   this.preloadBackgroundImages();
 
-  this.load.audio( "bell2", "assets/sounds/bell2.wav" );
-  this.load.audio( "hohoho", "assets/sounds/hohoho.mp3");
-  this.load.audio( "steps", "assets/sounds/reindeer_bells.wav");
-  this.load.audio( "woohoo", "assets/sounds/woohoo.mp3");
-  this.load.audio( "ah", "assets/sounds/ah.mp3");
-  this.load.audio( "box_drop", "assets/sounds/box_drop.mp3");
+  this.preloadSounds();
 };
 
 OneRoom.Preloader.prototype.preloadFonts = function()
@@ -85,8 +80,12 @@ OneRoom.Preloader.prototype.create = function()
 
   this.numberOfDecodedSounds = 0;
 
-  var bell2 = this.game.add.audio( "bell2" );
-  this.soundList.push( bell2 );
+  // TODO: Reduce redundancy here.
+  this.soundList.push( this.game.add.audio( "hohoho" ) );
+  this.soundList.push( this.game.add.audio( "steps" ) );
+  this.soundList.push( this.game.add.audio( "woohoo" ) );
+  this.soundList.push( this.game.add.audio( "ah" ) );
+  this.soundList.push( this.game.add.audio( "box_drop" ) );
 
   // Apply callback to decoding sounds.
   for( var i = 0; i < this.soundList.length; i++ )
@@ -96,6 +95,15 @@ OneRoom.Preloader.prototype.create = function()
 
   this.sound.setDecodedCallback( this.soundList, this.allSoundsDecoded, this );
 };
+
+OneRoom.Preloader.prototype.preloadSounds = function( audio )
+{
+  this.load.audio( "hohoho", "assets/sounds/hohoho.mp3");
+  this.load.audio( "steps", "assets/sounds/reindeer_bells.wav");
+  this.load.audio( "woohoo", "assets/sounds/woohoo.mp3");
+  this.load.audio( "ah", "assets/sounds/ah.mp3");
+  this.load.audio( "box_drop", "assets/sounds/box_drop.mp3");
+}
 
 OneRoom.Preloader.prototype.soundDecoded = function( audio )
 {
