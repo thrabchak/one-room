@@ -17,13 +17,17 @@ OneRoom.Game = function( game )
 {
   this.debugModeOn = false;
 
+  this.paused = false;
+
   this.cursorKeys = null;
   this.spaceBar = null;
   this.enterKey = null;
   this.escapeKey = null;
+  this.debugKey = null;
 
   this.buttonList = [];
   this.exitButton = null;
+  this.muteButton = null;
   this.buttonGroup = null;
 
   this.modalYesButton = null;
@@ -106,7 +110,7 @@ OneRoom.Game.prototype.create = function()
   this.game.debug.reset();
 };
 
-OneRoom.Game.prototype.setupInput = function()
+OneRoom.Game.prototype.setupInput = function( createNewButtons )
 {
   // Game Controls
   // =========
@@ -115,6 +119,11 @@ OneRoom.Game.prototype.setupInput = function()
   // Arrow right         Move right         Run right
   // Arrow down          Crouch             Go down chimney, Slide
   // Space bar           Jump               Double bounce off walls?
+
+  if( createNewButtons === undefined )
+  {
+    createNewButtons = true;
+  }
 
   this.escapeKey = this.input.keyboard.addKey( Phaser.Keyboard.ESC );
   this.escapeKey.onDown.add( this.escapeKeyDown, this );
@@ -127,8 +136,10 @@ OneRoom.Game.prototype.setupInput = function()
   // Buttons.
   OneRoom.activeButton = null;
 
-  this.exitButton = OneRoom.createTextButton( 0, 32,
-                                                "Exit", this.escapeKeyDown, this );
+  if( createNewButtons )
+  {
+    this.exitButton = OneRoom.createTextButton( 0, 32, "Exit", this.escapeKeyDown, this );
+  }
 
   // Position button based on width.
   // NOTE: Using child label width, as parent button width member is not
@@ -139,47 +150,72 @@ OneRoom.Game.prototype.setupInput = function()
 
   var mute = OneRoom.getMute();
   var muteText = mute ? "Unmute" : "  Mute";
-  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
-  this.muteButton = OneRoom.createTextButton( 0, 32,
-                                                muteText, this.toggleMute, null );
-
+  if( createNewButtons )
+  {
+    this.muteButton = OneRoom.createTextButton( 0, 32,  muteText, this.toggleMute, null );
+  }
   this.muteButton.position.x = this.exitButton.position.x - this.muteButton.children[0].width;
+
   this.muteButton.input.priorityID = 1;
 
-  this.buttonGroup = this.game.add.group();
-  this.buttonGroup.add( this.exitButton );
-  this.buttonGroup.add( this.muteButton );
+  if( createNewButtons )
+  {
+    this.buttonGroup = this.game.add.group();
+    this.buttonGroup.add( this.exitButton );
+    this.buttonGroup.add( this.muteButton );
+  }
   this.buttonGroup.fixedToCamera = true;
 
   // Modal dialog buttons.
-  this.modalYesButton = OneRoom.createTextButton( 0, 0,
-                                                    "Yes", this.returnToMainMenu, this );
+  if( createNewButtons )
+  {
+    this.modalYesButton = OneRoom.createTextButton( 0, 0, "Yes", this.returnToMainMenu, this );
+  }
   this.modalYesButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.modalYesButton.input.priorityID = 3;
 
-  this.modalNoButton = OneRoom.createTextButton( 0, 0,
-                                                   "No", this.toggleModal, this );
+  if( createNewButtons )
+  {
+    this.modalNoButton = OneRoom.createTextButton( 0, 0, "No", this.toggleModal, this );
+  }
   this.modalNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.modalNoButton.input.priorityID = 3;
 
   // Finished Level dialog buttons.
-  this.nextLevelButton = OneRoom.createTextButton( 0, 0,
-                                                    "Yes", this.goToNextLevel, this );
+  if( createNewButtons )
+  {
+    this.nextLevelButton = OneRoom.createTextButton( 0, 0, "Yes", this.goToNextLevel, this );
+  }
   this.nextLevelButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.nextLevelButton.input.priorityID = 3;
 
-  this.nextLevelNoButton = OneRoom.createTextButton( 0, 0,
-                                                   "No", this.returnToMainMenu, this );
+  if( createNewButtons )
+  {
+    this.nextLevelNoButton = OneRoom.createTextButton( 0, 0, "No", this.returnToMainMenu, this );
+  }
   this.nextLevelNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.nextLevelNoButton.input.priorityID = 3;
 
   // Gamepads.
-  this.setupGamepads();
+  if( createNewButtons )
+  {
+    this.setupGamepads();
+  }
 
   // Movement controls
   this.cursorKeys = this.input.keyboard.createCursorKeys();
+
   this.spaceBar = this.input.keyboard.addKey( Phaser.Keyboard.SPACEBAR );
   this.spaceBar.onDown.add( this.spacebarKeyDown, this );
+};
+
+OneRoom.Game.prototype.setupKeys = function()
+{
+};
+
+OneRoom.Game.prototype.setupButtons = function()
+{
+
 };
 
 OneRoom.Game.prototype.setupGamepads = function()
@@ -224,6 +260,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.setupLevelEndDialog();
 
+  this.setPaused( false );
 };
 
 OneRoom.Game.prototype.setupJollyometer = function()
@@ -561,6 +598,11 @@ OneRoom.Game.prototype.update = function()
     }
   }
 
+  if( this.paused )
+  {
+    return;
+  }
+
   this.objectiveUpdate();
 
   this.jollyometer.scale.x = this.jollyometerValue / 100;
@@ -604,6 +646,8 @@ OneRoom.Game.prototype.leaveHouse = function()
     console.log("Congrats you finished the level.");
 
     this.nextLevelDialogGroup.visible = true;
+    this.setPaused( true );
+    
     //this.currentLevelNumber++;
   }
 };
@@ -857,6 +901,9 @@ OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
 
 OneRoom.Game.prototype.gamepadUpdate = function()
 {
+  // NOTE: This method should not actually affect game stay;
+  // just issue events (in case of pause state).
+
   /*if( this.game.input.gamepad.supported && this.game.input.gamepad.active )
   {
     for( var i = 0; i < this.gamepadList.length; i++ )
@@ -901,7 +948,11 @@ OneRoom.Game.prototype.toggleModal = function()
   else
   {
     OneRoom.clearButtonKeys( this );
+
+    this.setupInput( false );
   }
+
+  this.setPaused( !this.paused );
 };
 
 OneRoom.Game.prototype.returnToMainMenu = function()
@@ -1027,4 +1078,9 @@ OneRoom.Game.prototype.render = function()
   this.game.debug.cameraInfo(this.game.camera, 32, 400);
 };
 
+OneRoom.Game.prototype.setPaused = function( paused )
+{
+  this.paused = paused;
 
+  this.game.physics.arcade.isPaused = paused;
+};
