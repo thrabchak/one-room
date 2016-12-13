@@ -253,6 +253,7 @@ OneRoom.Game.prototype.setupJollyometer = function()
   var jollyText = this.game.add.bitmapText( 0, 0, "MountainsOfChristmas", jollyTextValue, 32 );
   jollyText.position.setTo( xpos, ypos );
   jollyText.anchor.setTo( 0.5 );
+  jollyText.fixedToCamera = true;
 };
 
 OneRoom.Game.prototype.setupExitDialog = function()
@@ -371,6 +372,7 @@ OneRoom.Game.prototype.buildWorld = function()
   this.setSpritePositionFromMap( this.objectLayer, "tree", this.treeSprite );
 
   this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
+  this.moonSprite.fixedToCamera = true;
 
   this.setupSanta();
 
@@ -387,7 +389,8 @@ OneRoom.Game.prototype.buildWorld = function()
   this.fireplaceZone.enableBody = true;
   this.fireplaceZone.body.allowGravity = false;
   this.fireplaceZone.body.immovable = true;
-  this.fireplaceZone.visible = false;
+  //this.fireplaceZone.visible = false; // TODO: Report phaser bug about when this is true when screen scrolls.
+  this.fireplaceZone.alpha = 0.0;
   
   this.setSpritePositionFromMap( this.objectLayer, "fireplace", this.fireplaceZone );
 };
