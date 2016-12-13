@@ -218,8 +218,6 @@ OneRoom.Game.prototype.setupGraphics = function()
   
   this.setupJollyometer();
 
-  this.setupSanta();
-
   this.setupPresents();
 
   this.setupExitDialog();
