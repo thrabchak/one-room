@@ -242,15 +242,6 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.game.world.bringToTop( allTextGroup );
 
-  var background = this.game.add.sprite( 0, 0 );
-  background.fixedToCamera = true;
-  background.scale.setTo( this.game.width, this.game.height );
-  background.inputEnabled = true;
-  background.input.priorityID = 0;
-  background.events.onInputDown.add( this.pointerDown, this );
-
-  this.game.world.sendToBack( background );
-
   this.buildWorld();
   
   this.setupJollyometer();
@@ -762,13 +753,19 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     if (this.santa.body.velocity.x === 0.0)
     {
       //  Stand still
-      this.santa.animations.play('idle');
+      if( this.santa.animations.isLoaded )
+      {
+        this.santa.animations.play('idle');
+      }
       this.stepsSound.pause();
     }
     else
     {
       //  Move to left or right.
-      this.santa.animations.play('run_right');
+      if( this.santa.animations.isLoaded )
+      {
+        this.santa.animations.play('run_right');
+      }
 
       var shouldBeFacingLeft = ( this.santa.body.velocity.x < 0.0 );
 
