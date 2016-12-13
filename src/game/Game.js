@@ -731,8 +731,6 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     //  Reset the players velocity (movement)
     this.santa.body.velocity.x = 0;
 
-    changedFacingDirection = false;
-
     if( this.santaInChimney )
     {
       // Disable santa controls while in chimney.
@@ -751,44 +749,42 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
 
     if (this.cursorKeys.left.isDown)
     {
-      //  Move to the left
       this.santa.body.velocity.x = -150;
-      this.santa.animations.play('run_right');
-
-      // Play steps sound
-      if(!this.stepsSound.isPlaying)
-      {
-        this.stepsSound.play();
-      }
-
-      if(!this.santaFacingLeft){
-        changedFacingDirection = true;
-      }
-
-      this.santaFacingLeft = true;
     }
     else if (this.cursorKeys.right.isDown)
     {
-      //  Move to the right
       this.santa.body.velocity.x = 150;
-      this.santa.animations.play('run_right');
-
-      // Play steps sound
-      if(!this.stepsSound.isPlaying)
-      {
-        this.stepsSound.play();
-      }
-
-      if(this.santaFacingLeft){
-        changedFacingDirection = true;
-      }
-      this.santaFacingLeft = false;
     }
-    else
+
+    // TODO: Determine if Santa is colliding or is
+    // about to collide with a vertical platform.
+
+    if (this.santa.body.velocity.x === 0.0)
     {
       //  Stand still
       this.santa.animations.play('idle');
       this.stepsSound.pause();
+    }
+    else
+    {
+      //  Move to left or right.
+      this.santa.animations.play('run_right');
+
+      var shouldBeFacingLeft = ( this.santa.body.velocity.x < 0.0 );
+
+      // Left.
+      if( shouldBeFacingLeft !== this.santaFacingLeft )
+      {
+        this.santa.scale.x *= -1;
+      }
+
+      this.santaFacingLeft = shouldBeFacingLeft;
+
+      // Play steps sound
+      if(!this.stepsSound.isPlaying)
+      {
+        this.stepsSound.play();
+      }
     }
 
     //  Allow the this.santa to jump if they are touching the ground.
@@ -808,11 +804,6 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
           this.santa.body.velocity.y = -450;
         }
       }
-    }
-
-    if(changedFacingDirection)
-    {
-      this.santa.scale.x *= -1;
     }
 };
 
