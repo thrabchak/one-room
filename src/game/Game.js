@@ -58,6 +58,7 @@ OneRoom.Game = function( game )
   this.map = null;
   this.layer = null;
   this.objectLayer = null;
+  this.middleGroundTilemapLayer = null;
   
   this.boxDropSound = null;
   this.ahSound = null;
@@ -440,7 +441,7 @@ OneRoom.Game.prototype.loadLevelTilemap = function( levelNumber )
   this.map.smoothed = false;
 
   this.map.createLayer( "Background" );
-  this.map.createLayer( "Middleground" );
+  this.middleGroundTilemapLayer = this.map.createLayer( "Middleground" );
   this.map.createLayer( "Decorations" );
   this.layer = this.map.createLayer( "Platforms" );
   this.layer.visible = false;
@@ -627,8 +628,8 @@ OneRoom.Game.prototype.killSanta = function()
 OneRoom.Game.prototype.enterHouse = function()
 {
   this.enteredHouse = true;
-  this.santaInChimney = false;
-  this.santa.alpha = 1.0;
+
+  this.removeSantaFromChimney();
 
   if(!this.deliveredPresents)
   {    
@@ -639,8 +640,7 @@ OneRoom.Game.prototype.enterHouse = function()
 
 OneRoom.Game.prototype.leaveHouse = function()
 {
-  this.santaInChimney = false;
-  this.santa.alpha = 1.0;
+  this.removeSantaFromChimney();
 
   if(this.deliveredPresents)
   {
@@ -857,6 +857,7 @@ OneRoom.Game.prototype.handlePlatformCollision = function( santa, tile )
 OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
 {
   this.santaInChimney = true;
+
   this.santa.alpha = 0.5;
   this.santa.animations.play('idle');
   this.stepsSound.stop();
@@ -866,10 +867,19 @@ OneRoom.Game.prototype.putSantaInChimney = function( chinmeyDirection )
   
   this.santaChinmeyDirection = chinmeyDirection;
 
-  //this.santa.body.gravity.y = 0.0;
+  this.cacheSantaWorldIndex = this.game.world.getIndex( this.santa );
+  var middleGroundTilemapLayerWorldIndex = this.game.world.getIndex( this.middleGroundTilemapLayer );
+  this.game.world.remove( this.santa );
+  this.game.world.addAt( this.santa, middleGroundTilemapLayerWorldIndex, true );
+};
 
-  //var chinmeyMovementVelocity = 150;
-  //this.santa.body.velocity.y = chinmeyMovementVelocity * chinmeyDirection;
+OneRoom.Game.prototype.removeSantaFromChimney = function()
+{
+  this.santaInChimney = false;
+  this.santa.alpha = 1.0;
+
+  this.game.world.remove( this.santa );
+  this.game.world.addAt( this.santa, this.cacheSantaWorldIndex, true );
 };
 
 OneRoom.Game.prototype.escapeKeyDown = function( button )
