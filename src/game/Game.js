@@ -17,13 +17,17 @@ OneRoom.Game = function( game )
 {
   this.debugModeOn = false;
 
+  this.paused = false;
+
   this.cursorKeys = null;
   this.spaceBar = null;
   this.enterKey = null;
   this.escapeKey = null;
+  this.debugKey = null;
 
   this.buttonList = [];
   this.exitButton = null;
+  this.muteButton = null;
   this.buttonGroup = null;
 
   this.modalYesButton = null;
@@ -40,7 +44,6 @@ OneRoom.Game = function( game )
     onDown: this.gamepadOnDown
   };
 
-  this.circleSprite = null;
   this.targetPoint = new Phaser.Point();
 
   this.santa = null;
@@ -61,7 +64,6 @@ OneRoom.Game = function( game )
   this.woohooSound = null;
   this.hohohoSound = null;
   this.stepsSound = null;
-  this.bell = null;
   this.soundList = [];
 
   this.santaFacingLeft = false;
@@ -73,7 +75,7 @@ OneRoom.Game = function( game )
 
   this.presentsGroup = null;
 
-  this.jollyometerValue = 85;
+  this.jollyometerValue = 0;
   this.jollyometer = null;
   this.jollyIterator = 0;
   this.jollyDepletionFrames = 18;
@@ -97,7 +99,8 @@ OneRoom.Game.prototype.create = function()
   this.enteredHouse = false;
   this.deliveredPresents = false;
   this.leftHouse = false;
-  this.jollyometerValue = 85
+
+  this.setJollyometerValue( 85 );
 
   this.setupInput();
   this.setupGraphics();
@@ -106,7 +109,7 @@ OneRoom.Game.prototype.create = function()
   this.game.debug.reset();
 };
 
-OneRoom.Game.prototype.setupInput = function()
+OneRoom.Game.prototype.setupInput = function( createNewButtons )
 {
   // Game Controls
   // =========
@@ -115,6 +118,11 @@ OneRoom.Game.prototype.setupInput = function()
   // Arrow right         Move right         Run right
   // Arrow down          Crouch             Go down chimney, Slide
   // Space bar           Jump               Double bounce off walls?
+
+  if( createNewButtons === undefined )
+  {
+    createNewButtons = true;
+  }
 
   this.escapeKey = this.input.keyboard.addKey( Phaser.Keyboard.ESC );
   this.escapeKey.onDown.add( this.escapeKeyDown, this );
@@ -127,8 +135,10 @@ OneRoom.Game.prototype.setupInput = function()
   // Buttons.
   OneRoom.activeButton = null;
 
-  this.exitButton = OneRoom.createTextButton( 0, 32,
-                                                "Exit", this.escapeKeyDown, this );
+  if( createNewButtons )
+  {
+    this.exitButton = OneRoom.createTextButton( 0, 32, "Exit", this.escapeKeyDown, this );
+  }
 
   // Position button based on width.
   // NOTE: Using child label width, as parent button width member is not
@@ -139,47 +149,72 @@ OneRoom.Game.prototype.setupInput = function()
 
   var mute = OneRoom.getMute();
   var muteText = mute ? "Unmute" : "  Mute";
-  //var muteButtonStyle = mute ? OneRoom.buttonActiveStyle : OneRoom.buttonStyle;
-  this.muteButton = OneRoom.createTextButton( 0, 32,
-                                                muteText, this.toggleMute, null );
-
+  if( createNewButtons )
+  {
+    this.muteButton = OneRoom.createTextButton( 0, 32,  muteText, this.toggleMute, null );
+  }
   this.muteButton.position.x = this.exitButton.position.x - this.muteButton.children[0].width;
+
   this.muteButton.input.priorityID = 1;
 
-  this.buttonGroup = this.game.add.group();
-  this.buttonGroup.add( this.exitButton );
-  this.buttonGroup.add( this.muteButton );
+  if( createNewButtons )
+  {
+    this.buttonGroup = this.game.add.group();
+    this.buttonGroup.add( this.exitButton );
+    this.buttonGroup.add( this.muteButton );
+  }
   this.buttonGroup.fixedToCamera = true;
 
   // Modal dialog buttons.
-  this.modalYesButton = OneRoom.createTextButton( 0, 0,
-                                                    "Yes", this.returnToMainMenu, this );
+  if( createNewButtons )
+  {
+    this.modalYesButton = OneRoom.createTextButton( 0, 0, "Yes", this.returnToMainMenu, this );
+  }
   this.modalYesButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.modalYesButton.input.priorityID = 3;
 
-  this.modalNoButton = OneRoom.createTextButton( 0, 0,
-                                                   "No", this.toggleModal, this );
+  if( createNewButtons )
+  {
+    this.modalNoButton = OneRoom.createTextButton( 0, 0, "No", this.toggleModal, this );
+  }
   this.modalNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.modalNoButton.input.priorityID = 3;
 
   // Finished Level dialog buttons.
-  this.nextLevelButton = OneRoom.createTextButton( 0, 0,
-                                                    "Yes", this.goToNextLevel, this );
+  if( createNewButtons )
+  {
+    this.nextLevelButton = OneRoom.createTextButton( 0, 0, "Yes", this.goToNextLevel, this );
+  }
   this.nextLevelButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 1 );
   this.nextLevelButton.input.priorityID = 3;
 
-  this.nextLevelNoButton = OneRoom.createTextButton( 0, 0,
-                                                   "No", this.returnToMainMenu, this );
+  if( createNewButtons )
+  {
+    this.nextLevelNoButton = OneRoom.createTextButton( 0, 0, "No", this.returnToMainMenu, this );
+  }
   this.nextLevelNoButton.position.setTo( this.game.camera.width / 2, this.game.camera.height / 2 + 48 * 2 );
   this.nextLevelNoButton.input.priorityID = 3;
 
   // Gamepads.
-  this.setupGamepads();
+  if( createNewButtons )
+  {
+    this.setupGamepads();
+  }
 
   // Movement controls
   this.cursorKeys = this.input.keyboard.createCursorKeys();
+
   this.spaceBar = this.input.keyboard.addKey( Phaser.Keyboard.SPACEBAR );
   this.spaceBar.onDown.add( this.spacebarKeyDown, this );
+};
+
+OneRoom.Game.prototype.setupKeys = function()
+{
+};
+
+OneRoom.Game.prototype.setupButtons = function()
+{
+
 };
 
 OneRoom.Game.prototype.setupGamepads = function()
@@ -201,18 +236,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.game.add.tween( allTextGroup ).to( { alpha: 1 }, 500, Phaser.Easing.Linear.None, true );
 
-  this.circleSprite = this.createCircleSprite();
-
   this.game.world.bringToTop( allTextGroup );
-
-  var background = this.game.add.sprite( 0, 0 );
-  background.fixedToCamera = true;
-  background.scale.setTo( this.game.width, this.game.height );
-  background.inputEnabled = true;
-  background.input.priorityID = 0;
-  background.events.onInputDown.add( this.pointerDown, this );
-
-  this.game.world.sendToBack( background );
 
   this.buildWorld();
   
@@ -224,6 +248,7 @@ OneRoom.Game.prototype.setupGraphics = function()
 
   this.setupLevelEndDialog();
 
+  this.setPaused( false );
 };
 
 OneRoom.Game.prototype.setupJollyometer = function()
@@ -515,8 +540,7 @@ OneRoom.Game.prototype.loadBackgroundImage = function()
 
 OneRoom.Game.prototype.setupSounds = function()
 {
-  this.bell = this.game.add.audio( "bell2" );
-  this.soundList.push( this.bell );
+  this.game.sound.stopAll();
 
   this.hohohoSound = this.game.add.audio( "hohoho", 1, false, true );
   this.soundList.push( this.hohohoSound );
@@ -561,13 +585,18 @@ OneRoom.Game.prototype.update = function()
     }
   }
 
+  if( this.paused )
+  {
+    return;
+  }
+
   this.objectiveUpdate();
 
   this.jollyometer.scale.x = this.jollyometerValue / 100;
   this.jollyIterator += 1;
   if( this.jollyIterator == this.jollyDepletionFrames )
   {
-    this.jollyometerValue -= 1;
+    this.setJollyometerValue( this.jollyometerValue - 1 );
     this.jollyIterator = 0;
   }
 
@@ -576,8 +605,24 @@ OneRoom.Game.prototype.update = function()
 
 OneRoom.Game.prototype.addJollyness = function(x)
 {
-  this.jollyometerValue = Math.min(100, this.jollyometerValue + x);
+  this.setJollyometerValue( Math.min(100, this.jollyometerValue + x) );
 };
+
+OneRoom.Game.prototype.setJollyometerValue = function( value )
+{
+  this.jollyometerValue = value;
+  if( value <= 0 )
+  {
+    this.killSanta();
+  }
+};
+
+OneRoom.Game.prototype.killSanta = function()
+{
+  // TODO: Give a delay and a message, sound effects?
+
+  this.restartLevel();
+}
 
 OneRoom.Game.prototype.enterHouse = function()
 {
@@ -604,6 +649,8 @@ OneRoom.Game.prototype.leaveHouse = function()
     console.log("Congrats you finished the level.");
 
     this.nextLevelDialogGroup.visible = true;
+    this.setPaused( true );
+
     //this.currentLevelNumber++;
   }
 };
@@ -668,8 +715,6 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     //  Reset the players velocity (movement)
     this.santa.body.velocity.x = 0;
 
-    changedFacingDirection = false;
-
     if( this.santaInChimney )
     {
       // Disable santa controls while in chimney.
@@ -688,44 +733,48 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
 
     if (this.cursorKeys.left.isDown)
     {
-      //  Move to the left
       this.santa.body.velocity.x = -150;
-      this.santa.animations.play('run_right');
-
-      // Play steps sound
-      if(!this.stepsSound.isPlaying)
-      {
-        this.stepsSound.play();
-      }
-
-      if(!this.santaFacingLeft){
-        changedFacingDirection = true;
-      }
-
-      this.santaFacingLeft = true;
     }
     else if (this.cursorKeys.right.isDown)
     {
-      //  Move to the right
       this.santa.body.velocity.x = 150;
-      this.santa.animations.play('run_right');
+    }
+
+    // TODO: Determine if Santa is colliding or is
+    // about to collide with a vertical platform.
+
+    if (this.santa.body.velocity.x === 0.0)
+    {
+      //  Stand still
+      if( this.santa.animations.isLoaded )
+      {
+        this.santa.animations.play('idle');
+      }
+      this.stepsSound.pause();
+    }
+    else
+    {
+      //  Move to left or right.
+      if( this.santa.animations.isLoaded )
+      {
+        this.santa.animations.play('run_right');
+      }
+
+      var shouldBeFacingLeft = ( this.santa.body.velocity.x < 0.0 );
+
+      // Left.
+      if( shouldBeFacingLeft !== this.santaFacingLeft )
+      {
+        this.santa.scale.x *= -1;
+      }
+
+      this.santaFacingLeft = shouldBeFacingLeft;
 
       // Play steps sound
       if(!this.stepsSound.isPlaying)
       {
         this.stepsSound.play();
       }
-
-      if(this.santaFacingLeft){
-        changedFacingDirection = true;
-      }
-      this.santaFacingLeft = false;
-    }
-    else
-    {
-      //  Stand still
-      this.santa.animations.play('idle');
-      this.stepsSound.pause();
     }
 
     //  Allow the this.santa to jump if they are touching the ground.
@@ -745,11 +794,6 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
           this.santa.body.velocity.y = -450;
         }
       }
-    }
-
-    if(changedFacingDirection)
-    {
-      this.santa.scale.x *= -1;
     }
 };
 
@@ -796,17 +840,17 @@ OneRoom.Game.prototype.updateSantaGroundedType = function()
   }
 };
 
-OneRoom.Game.prototype.handlePlatformCollision = function( santa, platformLayer )
+OneRoom.Game.prototype.handlePlatformCollision = function( santa, tile )
 {
   this.updateSantaGroundedType();
 
-  if( this.santaGroundedType === 1 )
+  var tileType = tile.properties.type;
+  if( tileType !== undefined )
   {
-    //this.santa.tint = 0xff0000;
-  }
-  else
-  {
-    //this.santa.tint = 0xffffff;
+    if( tileType === "death" )
+    {
+      this.setJollyometerValue( 0.0 );
+    }
   }
 };
 
@@ -857,6 +901,9 @@ OneRoom.Game.prototype.pointerDown = function( sprite, pointer )
 
 OneRoom.Game.prototype.gamepadUpdate = function()
 {
+  // NOTE: This method should not actually affect game stay;
+  // just issue events (in case of pause state).
+
   /*if( this.game.input.gamepad.supported && this.game.input.gamepad.active )
   {
     for( var i = 0; i < this.gamepadList.length; i++ )
@@ -901,7 +948,11 @@ OneRoom.Game.prototype.toggleModal = function()
   else
   {
     OneRoom.clearButtonKeys( this );
+
+    this.setupInput( false );
   }
+
+  this.setPaused( !this.paused );
 };
 
 OneRoom.Game.prototype.returnToMainMenu = function()
@@ -909,6 +960,13 @@ OneRoom.Game.prototype.returnToMainMenu = function()
   this.game.sound.stopAll();
   
   this.state.start( OneRoom.MainMenu.stateKey, true );
+};
+
+OneRoom.Game.prototype.restartLevel = function()
+{
+  this.game.sound.stopAll(); // TODO: Figure out why this line isn't really stopping sounds.
+
+  this.state.start( OneRoom.Game.stateKey, true, false );
 };
 
 OneRoom.Game.prototype.goToNextLevel = function()
@@ -922,71 +980,7 @@ OneRoom.Game.prototype.goToNextLevel = function()
 
 OneRoom.Game.prototype.makeImpact = function( x, y )
 {
-  if( !!this.bell._sound )
-  {
-    this.adjustBellPitch();
-  }
-  else
-  {
-    this.bell.onPlay.add( this.adjustBellPitch, this );
-  }
-
-  //this.bell.play();
-
-  //this.resetCircleSprite( this.circleSprite, x, y );
-};
-
-OneRoom.Game.prototype.createCircleSprite = function()
-{
-  var bmd = this.game.add.bitmapData( 128, 128 );
-
-  bmd.ctx.fillStyle = "#999999";
-  bmd.ctx.beginPath();
-  bmd.ctx.arc( 64, 64, 64, 0, Math.PI * 2, true ); 
-  bmd.ctx.closePath();
-  bmd.ctx.fill();
-
-  var sprite = this.game.add.sprite( 0, 0, bmd );
-  sprite.anchor.set( 0.5 );
-
-  sprite.alpha = 0.0;
-
-  return sprite;
-};
-
-OneRoom.Game.prototype.adjustBellPitch = function()
-{
-  var verticalScale = 4.0 * ( 1.0 - ( this.targetPoint.y / this.game.world.height ) );
-  this.bell._sound.playbackRate.value = verticalScale;
-};
-
-OneRoom.Game.prototype.resetCircleSprite = function( circleSprite, x, y )
-{
-  circleSprite.position.set( x, y );
-
-  circleSprite.scale.set( 0.5 );
-  circleSprite.alpha = 1.0;
-
-  var verticalScale = ( 1.0 - ( y / this.game.world.height ) );
-  var colorAdjustment = ( verticalScale * 255 ) | 0;
   
-  var r = 255 - colorAdjustment;
-  var g = 63;
-  var b = 0 + colorAdjustment;
-
-  if( colorAdjustment < 128 )
-  {
-    g += b;
-  }
-  else
-  {
-    g += r;
-  }
-
-  circleSprite.tint = ( r << 16 ) + ( g << 8 ) + b;
-
-  this.game.add.tween( circleSprite.scale ).to( { x: 4.0, y: 4.0 }, 500, Phaser.Easing.Sinusoidal.InOut, true );
-  this.game.add.tween( circleSprite ).to( { alpha: 0.0 }, 500, Phaser.Easing.Sinusoidal.InOut, true );
 };
 
 OneRoom.Game.prototype.toggleMute = function()
@@ -1027,4 +1021,9 @@ OneRoom.Game.prototype.render = function()
   this.game.debug.cameraInfo(this.game.camera, 32, 400);
 };
 
+OneRoom.Game.prototype.setPaused = function( paused )
+{
+  this.paused = paused;
 
+  this.game.physics.arcade.isPaused = paused;
+};
