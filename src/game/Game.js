@@ -800,32 +800,25 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
 OneRoom.Game.prototype.updateSantaGroundedType = function()
 {
   var isStandingOnChinmey = false;
+  var isStandingOnSomething = false;
+  
+  var halfSantaBodyWidth = this.santa.body.width / 2.0;
+  var fourthSantaBodyWidth = halfSantaBodyWidth / 2.0;
 
-  if( !this.santa.body.blocked.down &&
-      !this.santaInChimney )
+  var tiles = this.layer.getTiles( this.santa.body.x + fourthSantaBodyWidth,
+                                   this.santa.body.bottom,
+                                   halfSantaBodyWidth, 32 );
+  for( var index = 0; index < tiles.length; ++index )
   {
-    this.santaGroundedType = -1;
-    return;
-  }
-  else
-  {
-    var halfSantaBodyWidth = this.santa.body.width / 2.0;
-    var fourthSantaBodyWidth = halfSantaBodyWidth / 2.0;
-
-    var tiles = this.layer.getTiles( this.santa.body.x + fourthSantaBodyWidth,
-                                     this.santa.body.bottom,
-                                     halfSantaBodyWidth, 32 );
-    for( var index = 0; index < tiles.length; ++index )
+    var tile = tiles[index];
+    if( tile.index > 0 &&
+        tile.properties !== undefined )
     {
-      var tile = tiles[index];
-      if( tile.index > 0 &&
-          tile.properties !== undefined &&
-          tile.properties.type !== "normal" )
+      isStandingOnSomething = true;
+
+      if( tile.properties.type === "chimney_top" )
       {
-        if( tile.properties.type === "chimney_top" )
-        {
-          isStandingOnChinmey =  true;
-        }
+        isStandingOnChinmey =  true;
       }
     }
   }
@@ -835,8 +828,13 @@ OneRoom.Game.prototype.updateSantaGroundedType = function()
     this.santaGroundedType = 1;
   }
   else
+  if( isStandingOnSomething )
   {
     this.santaGroundedType = 0;
+  }
+  else
+  {
+    this.santaGroundedType = -1;
   }
 };
 
