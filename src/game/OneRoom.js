@@ -359,7 +359,7 @@ OneRoom.setupTitleAndText = function( state )
   titleTextY += 60;
   
   var titleText = state.game.add.bitmapText( titleTextX, titleTextY, "MountainsOfChristmas",
-                                             OneRoom.projectInfo.window.title, 128 );
+                                             "Sneaky Santa", 128 );
 
   titleText.anchor.setTo( 0.5 );
 

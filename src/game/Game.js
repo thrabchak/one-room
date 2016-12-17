@@ -397,8 +397,7 @@ OneRoom.Game.prototype.buildWorld = function()
 
   this.setSpritePositionFromMap( this.objectLayer, "tree", this.treeSprite );
 
-  this.moonSprite = this.add.sprite(0,0, 'moon_sheet', 1);
-  this.moonSprite.fixedToCamera = true;
+  this.moonSprite = this.add.sprite(130, 250, 'moon_sheet', 1);
 
   this.setupSanta();
 
