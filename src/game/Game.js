@@ -730,7 +730,7 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
       }
     }
 
-    if (this.cursorKeys.left.isDown)
+    if (this.cursorKeys.left.isDown )
     {
       this.santa.body.velocity.x = -150;
     }
@@ -738,12 +738,16 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
     {
       this.santa.body.velocity.x = 150;
     }
-
-    // TODO: Determine if Santa is colliding or is
-    // about to collide with a vertical platform.
-
-    if (this.santa.body.velocity.x === 0.0)
+    else
     {
+      this.santa.body.velocity.x = 0;
+    }
+
+    if ((this.santa.body.velocity.x === 0.0) ||
+        (this.santa.body.blocked.left || this.santa.body.blocked.right ))
+    {
+      this.santa.animations.stop();
+      
       //  Stand still
       if( this.santa.animations.isLoaded )
       {
@@ -751,7 +755,8 @@ OneRoom.Game.prototype.santaMovementUpdate = function()
       }
       this.stepsSound.pause();
     }
-    else
+    
+    if (this.santa.body.velocity.x !== 0.0)
     {
       //  Move to left or right.
       if( this.santa.animations.isLoaded )
